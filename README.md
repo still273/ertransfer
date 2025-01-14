@@ -1,5 +1,6 @@
 # No-code Benchmarking of Entity Resolution
 
+
 https://swimlanes.io/u/k3Rmy375P
 
 This is great news! The main requirement is to implement the following process:
@@ -21,3 +22,8 @@ docker run -it --entrypoint=/bin/bash --gpus all  emtransformer
 
 Some more matcher scripts are available here:
 https://github.com/nishadi/DLMatchers/tree/main/dockers/mostmatchers/scripts
+
+
+## Repository setup
+
+After `git clone` execute `git submodule update --recursive --init` to fetch the submodules.
