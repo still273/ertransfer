@@ -32,8 +32,9 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ## Apptainer
 
 ```bash
+mkdir -p ../apptainer ../output
 apptainer build ../apptainer/splitter.sif container.def
-apptainer run ~/nocode-er-bench/apptainer/splitter.sif ~/nocode-er-bench/datasets/d1_fodors_zagats/ ~/nocode-er-bench/output/ ~/nocode-er-bench/embedding/
+srun --gpus=1 apptainer run ../apptainer/splitter.sif ../datasets/d2_abt_buy/ ../output/ ../embedding/
 ```
 
 ## Cuda error

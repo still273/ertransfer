@@ -1,4 +1,4 @@
-tableA_id,tableA_http://www.okkam.org/ontology_restaurant1.owl#name,tableA_http://www.okkam.org/ontology_restaurant1.owl#phone_number,tableA_http://www.okkam.org/ontology_restaurant1.owl#street,tableB_id,tableB_http://www.okkam.org/ontology_restaurant2.owl#name,tableB_http://www.okkam.org/ontology_restaurant2.owl#phone_number,tableB_http://www.okkam.org/ontology_restaurant2.owl#street,label
+tableA_id,tableA_name,tableA_phone_number,tableA_street,tableB_id,tableB_name,tableB_phone_number,tableB_street,label
 46,smith & wollensky,212/753-1530,,1400,joss,310/276-1886,,0
 221,21 club,212/582-7200,,200,i trulli,212/481-7372,,0
 66,,,22 hawthorne st.,2066,swan oyster depot,415-673-1101,,0

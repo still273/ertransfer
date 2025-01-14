@@ -1,4 +1,4 @@
-id,http://www.okkam.org/ontology_restaurant2.owl#name,http://www.okkam.org/ontology_restaurant2.owl#phone_number,http://www.okkam.org/ontology_restaurant2.owl#street
+id,name,phone_number,street
 0,second avenue deli,212-677-0606,
 1,asian,,
 2,,,368 bleecker st.

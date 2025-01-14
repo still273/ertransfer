@@ -1,4 +1,4 @@
-id,http://www.okkam.org/ontology_restaurant1.owl#name,http://www.okkam.org/ontology_restaurant1.owl#phone_number,http://www.okkam.org/ontology_restaurant1.owl#street
+id,name,phone_number,street
 0,new york,,
 1,la grotta,404/231-1368,
 2,fenix,213/848-6677,

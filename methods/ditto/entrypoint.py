@@ -35,7 +35,8 @@ parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(
 parser.add_argument("--run_id", type=int, default=0)
 
 parser.add_argument("--model", type=str, default='distilbert')
-parser.add_argument('--epochs', default=1, type=float)
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,
+                    help='Number of epochs to train the model')
 
 args = parser.parse_args()
 

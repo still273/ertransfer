@@ -1,4 +1,4 @@
-tableA_id,tableA_http://www.okkam.org/ontology_restaurant1.owl#name,tableA_http://www.okkam.org/ontology_restaurant1.owl#phone_number,tableA_http://www.okkam.org/ontology_restaurant1.owl#street,tableB_id,tableB_http://www.okkam.org/ontology_restaurant2.owl#name,tableB_http://www.okkam.org/ontology_restaurant2.owl#phone_number,tableB_http://www.okkam.org/ontology_restaurant2.owl#street,label
+tableA_id,tableA_name,tableA_phone_number,tableA_street,tableB_id,tableB_name,tableB_phone_number,tableB_street,label
 84,,,2637 peachtree rd.  peachtree house condominium,93,french (new),,,0
 43,toulouse,404/351-9533,,981,russian,,,0
 171,uncle nick's,212/315-1726,,1822,,,45 mercer st.  between broome and grand sts.,0
