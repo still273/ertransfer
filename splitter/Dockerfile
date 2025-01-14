@@ -8,10 +8,11 @@ WORKDIR /workspace
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY DeepBlocker .
+COPY fork-deepblocker .
 COPY splitter.py .
 
+ENV PYTHONPATH="${PYTHONPATH}:/workspace/fork-deepblocker"
+
 # This allows to run the container as `docker run --rm <yourImageName> <args>`
-ENV PYTHONPATH="${PYTHONPATH}:/workspace/DeepBlocker"
 ENTRYPOINT ["python", "-u", "splitter.py"]
 CMD []

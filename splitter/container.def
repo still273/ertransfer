@@ -12,7 +12,7 @@ From: pytorch/pytorch:1.13.1-cuda11.6-cudnn8-runtime
 %files
     requirements.txt /srv
     splitter.py /srv
-    DeepBlocker /srv
+    fork-deepblocker /srv
 
 %post
     apt-get update --allow-insecure-repositories && \
@@ -23,7 +23,7 @@ From: pytorch/pytorch:1.13.1-cuda11.6-cudnn8-runtime
     pip install --no-cache-dir -r requirements.txt
 
 %environment
-    export PYTHONPATH="${PYTHONPATH}:/srv/DeepBlocker"
+    export PYTHONPATH="${PYTHONPATH}:/srv/fork-deepblocker"
 
 %runscript
     exec python -u /srv/splitter.py  "$@"

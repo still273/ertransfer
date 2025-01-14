@@ -1,3 +1,6 @@
+import sys
+sys.path.append('fork-deepblocker')
+
 import argparse
 from os import path
 import random
