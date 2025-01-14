@@ -32,8 +32,8 @@ def generate_candidates(embedding_path, tableA_df, tableB_df, matches_df, top_ke
     cand_tableB = tableB_df.add_prefix('tableB_')
 
     return pd.concat([
-        (cand_tableA.iloc[pairs_df['ltable_id']]).reset_index(drop=True),
-        (cand_tableB.iloc[pairs_df['rtable_id']]).reset_index(drop=True),
+        (cand_tableA.loc[pairs_df['ltable_id']]).reset_index(drop=True),
+        (cand_tableB.loc[pairs_df['rtable_id']]).reset_index(drop=True),
         pairs_df['label'].reset_index(drop=True)
     ], axis=1)
 
@@ -66,6 +66,9 @@ if __name__ == "__main__":
     tableB_df = pd.read_csv(path.join(args.input, 'tableB.csv'), encoding_errors='replace')
     matches_df = pd.read_csv(path.join(args.input, 'matches.csv'), encoding_errors='replace')
     print("Input tables are:", "A", tableA_df.shape, "B", tableB_df.shape, "Matches", matches_df.shape)
+
+    tableA_df = tableA_df.set_index('id', drop=False)
+    tableB_df = tableB_df.set_index('id', drop=False)
 
     train, test = split_input(str(args.embedding), tableA_df, tableB_df, matches_df, recall=args.recall, top_key=args.top_key, seed=random.randint(0, 4294967295))
     print("Done! Train size: {}, test size: {}.".format(train.shape[0], test.shape[0]))

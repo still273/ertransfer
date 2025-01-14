@@ -46,11 +46,7 @@ train, test = datasets[0], datasets[1] if len(datasets) >= 2 else None
 model = HierMatcher(hidden_size=150, embedding_length=300, manualSeed=2)
 
 start_time = time.time()
-model.run_train(train, test, epochs=15,
-                batch_size=64,
-                label_smoothing=0.05,
-                pos_weight=1.5,
-                best_save_path='best_model.pth')
+model.run_train(train, test, epochs=15, batch_size=64, label_smoothing=0.05, pos_weight=1.5)
 train_time = time.time() - start_time
 train_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
