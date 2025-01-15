@@ -17,16 +17,23 @@ def generate_candidates(embedding_path, tableA_df, tableB_df, matches_df, top_ke
     cols_to_block.remove('id')
     print("Blocking columns: ", cols_to_block)
 
-    golden_df = matches_df.rename(columns={'tableA_id': 'ltable_id', 'tableB_id': 'rtable_id'})
+    #golden_df = matches_df.rename(columns={'tableA_id': 'ltable_id', 'tableB_id': 'rtable_id'})
 
     tuple_embedding_model = AutoEncoderTupleEmbedding(embedding_path=embedding_path)
     topK_vector_pairing_model = ExactTopKVectorPairing(K=top_key)
     db = DeepBlocker(tuple_embedding_model, topK_vector_pairing_model)
     candidate_set_df = db.block_datasets(tableA_df, tableB_df, cols_to_block)
+    candidate_set_df['ltable_id'] = tableA_df['id'].to_numpy()[candidate_set_df['ltable_id'].to_numpy()]
+    candidate_set_df['rtable_id'] = tableB_df['id'].to_numpy()[candidate_set_df['rtable_id'].to_numpy()]
 
-    golden_df['label'] = 1
-    candidate_set_df['label'] = 0
-    pairs_df = pd.concat([golden_df, candidate_set_df]).drop_duplicates(subset=['ltable_id', 'rtable_id'], keep='first')
+    #golden_df['label'] = 1
+    #candidate_set_df['label'] = 0
+    #pairs_df = pd.concat([golden_df, candidate_set_df]).drop_duplicates(subset=['ltable_id', 'rtable_id'], keep='first')
+
+    #Alternative Way for pairs_df (only keeps those true pairs, which were found in blocking)
+    golden_set = set(matches_df.itertuples(index=False, name=None))
+    pairs_df = candidate_set_df
+    pairs_df['label'] = pairs_df.apply(lambda x: (x['ltable_id'], x['rtable_id']) in golden_set, axis=1).astype(int)
 
     cand_tableA = tableA_df.add_prefix('tableA_')
     cand_tableB = tableB_df.add_prefix('tableB_')
@@ -46,11 +53,11 @@ def split_input(embedding_path, tableA_df, tableB_df, matches_df, recall=0.7, to
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Splits the dataset using DeepBlocker method')
-    parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
+    parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='../datasets/d2_abt_buy',
                         help='Input directory containing the dataset')
     parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?',
                         help='Output directory to store the output. If not provided, the input directory will be used')
-    parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='/workspace/embedding',
+    parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='../embedding', #/workspace
                     help='The directory where embeddings are stored')
     parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.7,
                         help='The recall value for the train set')
@@ -65,10 +72,16 @@ if __name__ == "__main__":
     tableA_df = pd.read_csv(path.join(args.input, 'tableA.csv'), encoding_errors='replace')
     tableB_df = pd.read_csv(path.join(args.input, 'tableB.csv'), encoding_errors='replace')
     matches_df = pd.read_csv(path.join(args.input, 'matches.csv'), encoding_errors='replace')
-    print("Input tables are:", "A", tableA_df.shape, "B", tableB_df.shape, "Matches", matches_df.shape)
 
     tableA_df = tableA_df.set_index('id', drop=False)
     tableB_df = tableB_df.set_index('id', drop=False)
+
+    #Remove those pairs from matches, which entries no longer appear in tableA or tableB:
+    A_match_exists = matches_df['tableA_id'].map(lambda x: x in tableA_df.index).astype(bool)
+    B_match_exists = matches_df['tableB_id'].map(lambda x: x in tableB_df.index).astype(bool)
+    matches_df = matches_df[A_match_exists & B_match_exists]
+
+    print("Input tables are:", "A", tableA_df.shape, "B", tableB_df.shape, "Matches", matches_df.shape)
 
     train, test = split_input(str(args.embedding), tableA_df, tableB_df, matches_df, recall=args.recall, top_key=args.top_key, seed=random.randint(0, 4294967295))
     print("Done! Train size: {}, test size: {}.".format(train.shape[0], test.shape[0]))
