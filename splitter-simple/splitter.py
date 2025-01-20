@@ -1,5 +1,6 @@
-import argparse
+
 import sys
+import argparse
 from os import path
 import random
 import pathtype
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                         help='Input directory containing the dataset')
     parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?',
-                        help='Output directory to store the output. If not provided, input directory will be used')
+                        help='Output directory to store the output. If not provided, the input directory will be used')
     parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.7,
                         help='The recall value for the train set')
     args = parser.parse_args()

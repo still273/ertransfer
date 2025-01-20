@@ -53,11 +53,11 @@ def split_input(embedding_path, tableA_df, tableB_df, matches_df, recall=0.7, to
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Splits the dataset using DeepBlocker method')
-    parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='../datasets/d2_abt_buy',
+    parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                         help='Input directory containing the dataset')
     parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?',
                         help='Output directory to store the output. If not provided, the input directory will be used')
-    parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='../embedding', #/workspace
+    parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='/workspace/embedding',
                     help='The directory where embeddings are stored')
     parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.7,
                         help='The recall value for the train set')
