@@ -28,3 +28,14 @@ You can override the input and output directories by providing them as arguments
 ```bash
 docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/output magellan /data/input /data/output
 ```
+
+## Apptainer
+
+```bash
+mkdir -p ../../apptainer ../../output/magellan
+apptainer build ../../apptainer/magellan.sif container.def
+srun --gpus=1 apptainer run ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
+
+# dev mode with bind
+srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
+```

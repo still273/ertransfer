@@ -1,6 +1,9 @@
 .idea
 .vscode
 
+# Python garbadge
+__pycache__
+
 # JS garbadge
 .next
 node_modules

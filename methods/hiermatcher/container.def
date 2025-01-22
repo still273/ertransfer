@@ -1,0 +1,31 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
+
+%labels
+    Author Oleh Astappiev, Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to run HierMatcher for entity matching.
+    It requires 3 arguments: path to the input directory, path to the output directory, and the path to the embeddings.
+
+%files
+    requirements.txt /srv
+    fork-deepmatcher /srv
+    entrypoint.py /srv
+    transform.py /srv
+    HierMatcher.py /srv
+
+%post
+    apt-get update --allow-insecure-repositories && \
+        apt-get install -y build-essential && \
+        rm -rf /var/lib/apt/lists/*
+
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+
+%environment
+    export PYTHONPATH="${PYTHONPATH}:/srv/fork-deepmatcher"
+
+%runscript
+    exec python -u /srv/entrypoint.py  "$@"

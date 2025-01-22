@@ -24,14 +24,14 @@ wget https://zenodo.org/record/6466387/files/wiki.en.bin -O embedding/wiki.en.bi
 
 ## Methods
 
-| Name                                             | Status | GPU Container Status             |
-| ------------------------------------------------ | ------ | -------------------------------- |
-| [splitter-simple](splitter-simple/README.md)     | ok     | ok                               |
-| [splitter](splitter/README.md)                   | ok     | ok, but probably gpu is not used |
-| [deepmatcher](methods/deepmatcher/README.md)     | ok     | fails                            |
-| [ditto](methods/ditto/README.md)                 |        |                                  |
-| [emtransformer](methods/emtransformer/README.md) |        |                                  |
-| [gnem](methods/gnem/README.md)                   |        |                                  |
-| [hiermatcher](methods/hiermatcher/README.md)     |        |                                  |
-| [magellan](methods/magellan/README.md)           |        |                                  |
-| [zeroer](methods/zeroer/README.md)               |        |                                  |
+| Name                                             | Entrypoint       | GPU Container Status | Assigned to |
+| ------------------------------------------------ | ---------------- | -------------------- | ----------- |
+| [splitter-simple](splitter-simple/README.md)     | ok               | ok                   |             |
+| [splitter](splitter/README.md)                   | ok               | ok                   |             |
+| [deepmatcher](methods/deepmatcher/README.md)     | ok               | fails                |             |
+| [ditto](methods/ditto/README.md)                 | ok               |                      |             |
+| [emtransformer](methods/emtransformer/README.md) | ok               |                      |             |
+| [gnem](methods/gnem/README.md)                   | not implemmented |                      | Franziska   |
+| [hiermatcher](methods/hiermatcher/README.md)     | ok               | ok                   |             |
+| [magellan](methods/magellan/README.md)           | ok               | containerized        |             |
+| [zeroer](methods/zeroer/README.md)               | ok               |                      |             |

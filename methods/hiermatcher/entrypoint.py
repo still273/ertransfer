@@ -1,3 +1,6 @@
+import sys
+sys.path.append('fork-deepmatcher')
+
 import argparse
 import resource
 import time
@@ -16,6 +19,8 @@ parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', defa
                     help='Output directory to store the output')
 parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='/workspace/embedding',
                     help='The directory where embeddings are stored')
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,
+                    help='Number of epochs to train the model')
 
 args = parser.parse_args()
 
@@ -37,7 +42,7 @@ datasets = dm.data.process(path=args.output,
                            label_attr='label',
                            left_prefix='tableA_',
                            right_prefix='tableB_',
-                           #cache=None,
+                           cache=None,
                            embeddings_cache_path=args.embedding)
 
 train, test = datasets[0], datasets[1] if len(datasets) >= 2 else None
@@ -46,7 +51,7 @@ train, test = datasets[0], datasets[1] if len(datasets) >= 2 else None
 model = HierMatcher(hidden_size=150, embedding_length=300, manualSeed=2)
 
 start_time = time.time()
-model.run_train(train, test, epochs=15, batch_size=64, label_smoothing=0.05, pos_weight=1.5)
+model.run_train(train, test, epochs=args.epochs, batch_size=64, label_smoothing=0.05, pos_weight=1.5)
 train_time = time.time() - start_time
 train_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
