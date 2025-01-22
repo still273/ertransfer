@@ -39,3 +39,26 @@ srun --gpus=1 apptainer run ../../apptainer/magellan.sif ../../datasets/d2_abt_b
 # dev mode with bind
 srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
 ```
+
+## Latest error
+
+```bash
+Attribute (tableA_id ) does not qualify  to be a key; Not setting/replacing the key
+Attribute (tableA_id ) does not qualify  to be a key; Not setting/replacing the key
+Requested metadata ( key ) for the given DataFrame is not present in the catalog
+Traceback (most recent call last):
+  File "/srv/entrypoint.py", line 80, in <module>
+    train_f_vectors = em.extract_feature_vecs(train, feature_table=F, attrs_after='label')
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/py_entitymatching/feature/extractfeatures.py", line 203, in extract_feature_vecs
+    cm.get_metadata_for_candset(
+  File "/usr/local/lib/python3.11/site-packages/py_entitymatching/catalog/catalog_manager.py", line 1293, in get_metadata_for_candset
+    key = get_key(candset)
+          ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/py_entitymatching/catalog/catalog_manager.py", line 661, in get_key
+    return get_property(data_frame, 'key')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/py_entitymatching/catalog/catalog_manager.py", line 71, in get_property
+    raise KeyError(
+KeyError: 'Requested metadata ( key ) for the given DataFrame is not present in the catalog'
+```

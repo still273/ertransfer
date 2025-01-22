@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.9.1-cuda11.1-cudnn8-runtime
+
+%labels
+    Author Oleh Astappiev, Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to run DITTO for entity matching.
+    It requires 2 arguments: path to the input directory, path to the output directory.
+
+%files
+    requirements.txt /srv
+    entrypoint.py /srv
+    augment.py /srv
+    configs.json /srv
+    dataset.py /srv
+    ditto.py /srv
+    exceptions.py /srv
+    knowledge.py /srv
+    matcher.py /srv
+    summarize.py /srv
+    transform.py /srv
+    __init__.py /srv
+
+%post
+    apt-get update --allow-insecure-repositories && \
+        apt-get install -y build-essential && \
+        rm -rf /var/lib/apt/lists/*
+
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+    python -m spacy download en_core_web_lg
+    python -m nltk.downloader stopwords
+    mv /root/nltk_data /opt/conda/lib/nltk_data
+
+%runscript
+    exec python -u /srv/entrypoint.py  "$@"

@@ -1,0 +1,37 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
+
+%labels
+    Author Oleh Astappiev, Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to run EMTransformer for entity matching.
+    It requires 2 arguments: path to the input directory, path to the output directory.
+
+%files
+    requirements.txt /srv
+    entrypoint.py /srv
+    config.py /srv
+    data_loader.py /srv
+    feature_extraction.py /srv
+    logging_customized.py /srv
+    optimizer.py /srv
+    torch_initializer.py /srv
+    transform.py /srv
+    data_representation.py /srv
+    model.py /srv
+    prediction.py /srv
+    training.py /srv
+    __init__.py /srv
+
+%post
+    apt-get update --allow-insecure-repositories && \
+        apt-get install -y build-essential && \
+        rm -rf /var/lib/apt/lists/*
+
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+
+%runscript
+    exec python -u /srv/entrypoint.py  "$@"

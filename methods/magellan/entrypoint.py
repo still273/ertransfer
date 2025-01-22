@@ -27,7 +27,7 @@ print("Hi, I'm Magellan entrypoint!")
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
-excl_attributes = ['_id', 'tableA_id', 'tableB_id', 'label']
+excl_attributes = ['tableA_id', 'tableB_id', 'label']
 def add_catalog_information(df, tableA, tableB):
     em.set_ltable(df, tableA)
     em.set_rtable(df, tableB)

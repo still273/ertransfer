@@ -1,0 +1,35 @@
+Bootstrap: docker
+From: continuumio/miniconda3
+
+%labels
+    Author Oleh Astappiev, Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to run ZeroER for entity matching.
+    It requires 2 arguments: path to the input directory, path to the output directory.
+
+%files
+    environment.yml /srv
+    entrypoint.py /srv
+    feature_extraction.py /srv
+    magellan_modified_feature_generation.py /srv
+    model.py /srv
+    transform_datasets.py /srv
+    transform.py /srv
+    utils.py /srv
+    __init__.py /srv
+
+%post
+    apt-get update --allow-insecure-repositories && \
+        apt-get install -y build-essential && \
+        rm -rf /var/lib/apt/lists/*
+
+    cd /srv
+    conda env create -f environment.yml
+
+%environment
+    export PYTHONPATH="${PYTHONPATH}:/srv/fork-deepmatcher"
+
+%runscript
+    exec conda run --no-capture-output -n ZeroER python3 -u entrypoint.py "$@"
