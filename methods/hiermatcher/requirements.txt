@@ -1,3 +1,15 @@
 pathtype
-scikit-learn
 pandas
+
+# deepmatcher requirements
+torch>=1.10
+tqdm
+pyprind
+six
+Cython
+torchtext>=0.9
+nltk>=3.2.5
+fasttext
+pandas
+dill
+scikit-learn
