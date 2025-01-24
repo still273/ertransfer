@@ -1,0 +1,26 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.7.1-cuda11.0-cudnn8-runtime
+
+%labels
+    Author Oleh Astappiev, Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to run GNEM for entity matching.
+    It requires 2 arguments: path to the input directory, path to the output directory.
+
+%files
+    requirements.txt /srv
+    fork-gnem /srv
+    entrypoint.py /srv
+    transform.py /srv
+
+%post
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+
+%environment
+    export PYTHONPATH="${PYTHONPATH}:/srv/fork-gnem"
+
+%runscript
+    exec python -u /srv/entrypoint.py  "$@"

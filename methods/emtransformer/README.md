@@ -22,28 +22,13 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 
 ## Apptainer
 
+WARNING: This method doesn't use GPUs.
+
 ```bash
 mkdir -p ../../apptainer ../../output/emtransformer
 apptainer build ../../apptainer/emtransformer.sif container.def
-srun --gpus=1 apptainer run ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
+srun apptainer run ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
 
 # dev mode with bind
-srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
-```
-
-## Latest error
-
-```bash
-2024-07-17T12:51:13.177118254Z Traceback (most recent call last):
-2024-07-17T12:51:13.177123935Z   File "./entrypoint.py", line 41, in <module>
-2024-07-17T12:51:13.177318428Z     train_df, test_df = transform_input(args.input, columns_to_join, ' ', [prefix_1, prefix_2])
-2024-07-17T12:51:13.177333538Z   File "/workspace/transform.py", line 34, in transform_input
-2024-07-17T12:51:13.177340652Z     train = join_columns(train_df, columns_to_join, separator, prefixes)
-2024-07-17T12:51:13.177346454Z   File "/workspace/transform.py", line 8, in join_columns
-2024-07-17T12:51:13.177492973Z     agg_table = table['id']
-2024-07-17T12:51:13.177504075Z   File "/opt/conda/lib/python3.7/site-packages/pandas/core/frame.py", line 3458, in __getitem__
-2024-07-17T12:51:13.178376728Z     indexer = self.columns.get_loc(key)
-2024-07-17T12:51:13.178405294Z   File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 3363, in get_loc
-2024-07-17T12:51:13.179940585Z     raise KeyError(key) from err
-2024-07-17T12:51:13.180101232Z KeyError: 'id'
+srun apptainer run --bind ./:/srv ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
 ```

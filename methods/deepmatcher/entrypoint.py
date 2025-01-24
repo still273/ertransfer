@@ -59,6 +59,10 @@ stats = model.run_eval(test, return_stats=True)
 test_time = time.time() - start_time
 test_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
+# delete temporary files without tableA_id, tableB_id columns
+os.remove(os.path.join(args.output, 'train.csv'))
+os.remove(os.path.join(args.output, 'test.csv'))
+
 # Step 3. Convert the output into a common format
 transform_output(stats, test_time, test_max_mem, args.output)
 print("Final output: ", os.listdir(args.output))

@@ -24,14 +24,14 @@ wget https://zenodo.org/record/6466387/files/wiki.en.bin -O embedding/wiki.en.bi
 
 ## Methods
 
-| Name                                             | Entrypoint       | GPU Container Status            | Output format | Assigned to |
-| ------------------------------------------------ | ---------------- | ------------------------------- | ------------- | ----------- |
-| [splitter-simple](splitter-simple/README.md)     | ok               | ok                              | ok            |             |
-| [splitter](splitter/README.md)                   | ok               | ok                              | ok            |             |
-| [deepmatcher](methods/deepmatcher/README.md)     | ok               | ok                              |               |             |
-| [ditto](methods/ditto/README.md)                 | ok               | fails, issue with output dir    |               |             |
-| [emtransformer](methods/emtransformer/README.md) | ok               | probably, still running         |               |             |
-| [gnem](methods/gnem/README.md)                   | not implemmented |                                 |               | Franziska   |
-| [hiermatcher](methods/hiermatcher/README.md)     | ok               | ok                              |               |             |
-| [magellan](methods/magellan/README.md)           | ok               | fails, missing key in dataset   |               |             |
-| [zeroer](methods/zeroer/README.md)               | ok               | expects different input columns |               |             |
+| Name                                             | Entrypoint | GPU Container Status            | Output format                  | Assigned to |
+| ------------------------------------------------ | ---------- | ------------------------------- | ------------------------------ | ----------- |
+| [splitter-simple](splitter-simple/README.md)     | ok         | ok                              | ok                             |             |
+| [splitter](splitter/README.md)                   | ok         | ok                              | ok                             |             |
+| [deepmatcher](methods/deepmatcher/README.md)     | ok         | ok                              | predictions missing            | Franziska   |
+| [ditto](methods/ditto/README.md)                 | ok         | fails, issue with output dir    |                                | Oleh        |
+| [emtransformer](methods/emtransformer/README.md) | ok         | ok                              | scores eq 0, predictions empty | Franziska   |
+| [gnem](methods/gnem/README.md)                   | ok         | ok                              | predictions missing            | Franziska   |
+| [hiermatcher](methods/hiermatcher/README.md)     | ok         | ok                              | predictions missing            | Franziska   |
+| [magellan](methods/magellan/README.md)           | ok         | fails, missing key in dataset   |                                | Franziska   |
+| [zeroer](methods/zeroer/README.md)               | ok         | expects different input columns |                                | Franziska   |

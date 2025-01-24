@@ -136,5 +136,8 @@ prfs = {f'class_{no}': {key: float(prfs[nok][no]) for nok, key in enumerate(keys
 
 print(classification_report)
 
+# delete temporary files
+if os.path.exists(os.path.join(args.output, args.model)):
+    os.remove(os.path.join(args.output, args.model))
 
 transform_output(predictions, test_df, training_time + testing_time, args.output)

@@ -1,6 +1,34 @@
+# GNEM
 
-To test the **GNEM** docker, use the following commands:
+https://github.com/ChenRunjin/GNEM
 
-* docker run -it --gpus all --entrypoint=/bin/bash gnem
-* cd /workspace/GNEM
-* python train.py --seed 28 --log_freq 5 --lr 0.0001 --embed_lr 0.00002 --epochs 10 --batch_size 2 --tableA_path data/abt_buy/tableA.csv --tableB_path data/abt_buy/tableB.csv --train_path data/abt_buy/train.csv --test_path data/abt_buy/test.csv --val_path data/abt_buy/val.csv --gpu 0 --gcn_layer 1 --test_score_type mean min max
+## How to use
+
+You can directly execute the docker image as following:
+
+```bash
+docker run --rm -v .:/data gnem
+```
+
+This will assume that you have the input dataset in the current directory,
+it will mount it as `/data` and will output the results in the `output` subdirectory.
+
+You can override the input and output directories by providing them as arguments to the docker image:
+
+```bash
+docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/output gnem /data/input /data/output
+```
+
+## Apptainer
+
+```bash
+mkdir -p ../../apptainer ../../output/gnem
+apptainer build ../../apptainer/gnem.sif container.def
+srun --gpus=1 apptainer run ../../apptainer/gnem.sif ../../datasets/d2_abt_buy/ ../../output/gnem/
+
+# to verify efficiency
+seff $jobid
+
+# dev mode with bind
+srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/gnem.sif ../../datasets/d2_abt_buy/ ../../output/gnem/
+```

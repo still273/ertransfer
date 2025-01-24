@@ -125,6 +125,8 @@ full_run_time = time.time() - start_time
 train_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 print(f1s)
 
+# delete temporary files without tableA_id, tableB_id columns
+os.remove(os.path.join(args.output, 'train.csv'))
+os.remove(os.path.join(args.output, 'test.csv'))
+
 transform_output(f1s, ps, rs, full_run_time, train_max_mem, args.output)
-
-

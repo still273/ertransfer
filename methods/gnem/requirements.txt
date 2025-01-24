@@ -1,0 +1,6 @@
+pathtype
+pandas==1.3.3
+scikit-learn
+tensorboard
+transformers==4.28.0
+markupsafe==2.0.1
