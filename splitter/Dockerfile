@@ -11,8 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY fork-deepblocker .
 COPY splitter.py .
 
-ENV PYTHONPATH="${PYTHONPATH}:/workspace/fork-deepblocker"
-
 # This allows to run the container as `docker run --rm <yourImageName> <args>`
 ENTRYPOINT ["python", "-u", "splitter.py"]
 CMD []

@@ -123,7 +123,7 @@ f1s, ps, rs, score_dicts = train(train_iter, model_dir, logger, tf_logger, model
       scheduler=scheduler, log_freq=5, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'])
 train_time = time.process_time() - start_time
 
-transform_output(score_dicts, f1s, ps, rs, train_time, train_time, args.output)
+transform_output(score_dicts, f1s, ps, rs, train_time, 0, args.output)
 
 # Step 4. Delete temporary files
 os.remove(os.path.join(args.output, 'train.csv'))
