@@ -16,8 +16,6 @@ COPY entrypoint.py .
 COPY transform.py .
 COPY HierMatcher.py .
 
-ENV PYTHONPATH="${PYTHONPATH}:/workspace/fork-deepmatcher"
-
 # This allows to run the container as `docker run --rm <yourImageName> <args>`
 ENTRYPOINT ["python", "-u", "./entrypoint.py"]
 CMD []
