@@ -27,13 +27,13 @@ print("Hi, I'm Magellan entrypoint!")
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
-excl_attributes = ['tableA_id', 'tableB_id', 'label']
+excl_attributes = ['tableA_id', 'tableB_id', 'label', 'id']
 def add_catalog_information(df, tableA, tableB):
     em.set_ltable(df, tableA)
     em.set_rtable(df, tableB)
-    em.set_fk_ltable(df, excl_attributes[1])
-    em.set_fk_rtable(df, excl_attributes[2])
-    em.set_key(df, excl_attributes[0])
+    em.set_fk_ltable(df, 'tableA_id')
+    em.set_fk_rtable(df, 'tableB_id')
+    em.set_key(df, 'id')
 
 
 # Step 1. Convert input data into the format expected by the method
@@ -42,6 +42,9 @@ tableA = pd.read_csv(os.path.join(args.input, 'tableA.csv'), encoding_errors='re
 tableB = pd.read_csv(os.path.join(args.input, 'tableB.csv'), encoding_errors='replace')
 train = pd.read_csv(os.path.join(args.input, 'train.csv'), encoding_errors='replace')
 test = pd.read_csv(os.path.join(args.input, 'test.csv'), encoding_errors='replace')
+
+train['id'] = np.arange(train.shape[0])
+test['id'] = np.arange(test.shape[0])
 
 em.set_key(tableA, 'id')
 em.set_key(tableB, 'id')
