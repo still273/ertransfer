@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-def transform_output(score_dicts, f1s, ps, rs, runtime, max_mem, dest_dir):
+def transform_output(score_dicts, f1s, ps, rs, train_time, eval_time, dest_dir):
 
     # save predictions in predictions.csv
     l_id = []
@@ -22,7 +22,8 @@ def transform_output(score_dicts, f1s, ps, rs, runtime, max_mem, dest_dir):
         'f1': f1s,
         'precision': ps,
         'recall': rs,
-        'max_mem': [max_mem]*len(f1s),
-        'time': [runtime]*len(f1s),
+        'train_time': [train_time] * len(f1s),
+        'eval_time': [eval_time] * len(f1s),
     }).to_csv(os.path.join(dest_dir, 'metrics.csv'), index=False)
+
     return None

@@ -7,7 +7,6 @@ import pandas as pd
 
 from transform import transform_output
 import time
-import resource
 import os
 from train_GNEM import train
 import torch
@@ -118,18 +117,14 @@ model = model.to(embedmodel.device)
 pos = 2.0 * pos_neg_ratio / (1.0 + pos_neg_ratio)
 neg = 2.0 / (1.0 + pos_neg_ratio)
 criterion = nn.CrossEntropyLoss(weight=torch.Tensor([neg, pos])).to(embedmodel.device)
-start_time = time.time()
+
+start_time = time.process_time()
 f1s, ps, rs, score_dicts = train(train_iter, model_dir, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
       scheduler=scheduler, log_freq=5, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'])
-full_run_time = time.time() - start_time
-train_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+train_time = time.process_time() - start_time
 
-# delete temporary files without tableA_id, tableB_id columns
+transform_output(score_dicts, f1s, ps, rs, train_time, train_time, args.output)
+
+# Step 4. Delete temporary files
 os.remove(os.path.join(args.output, 'train.csv'))
 os.remove(os.path.join(args.output, 'test.csv'))
-
-
-
-
-
-transform_output(score_dicts, f1s, ps, rs, full_run_time, train_max_mem, args.output)

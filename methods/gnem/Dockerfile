@@ -8,8 +8,6 @@ COPY fork-gnem .
 COPY entrypoint.py .
 COPY transform.py .
 
-ENV PYTHONPATH="${PYTHONPATH}:/workspace/fork-gnem"
-
 # This allows to run the container as `docker run --rm <yourImageName> <args>`
 ENTRYPOINT ["python", "-u", "./entrypoint.py"]
 CMD []
