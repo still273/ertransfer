@@ -59,7 +59,7 @@ useful_field_num = len(tableA.columns)-1
 gcn_dim = 768
 
 #val_dataset = MergedMatchingDataset(args.val_path, tableA, tableB, other_path=[args.train_path, args.test_path])
-test_dataset = MergedMatchingDataset(os.path.join(args.output, 'test.csv'), tableA, tableB)
+test_dataset = MergedMatchingDataset(os.path.join(args.output, 'test.csv'), tableA, tableB, other_path=[os.path.join(args.output, 'train.csv')])
 train_dataset = MatchingDataset(os.path.join(args.output, 'train.csv'), tableA, tableB)
 
 train_iter = DataLoader(train_dataset, batch_size=8, collate_fn=collate_fn, shuffle=True)
@@ -119,14 +119,17 @@ pos = 2.0 * pos_neg_ratio / (1.0 + pos_neg_ratio)
 neg = 2.0 / (1.0 + pos_neg_ratio)
 criterion = nn.CrossEntropyLoss(weight=torch.Tensor([neg, pos])).to(embedmodel.device)
 start_time = time.time()
-f1s, ps, rs = train(train_iter, model_dir, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
+f1s, ps, rs, score_dicts = train(train_iter, model_dir, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
       scheduler=scheduler, log_freq=5, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'])
 full_run_time = time.time() - start_time
 train_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(f1s)
 
 # delete temporary files without tableA_id, tableB_id columns
 os.remove(os.path.join(args.output, 'train.csv'))
 os.remove(os.path.join(args.output, 'test.csv'))
 
-transform_output(f1s, ps, rs, full_run_time, train_max_mem, args.output)
+
+
+
+
+transform_output(score_dicts, f1s, ps, rs, full_run_time, train_max_mem, args.output)
