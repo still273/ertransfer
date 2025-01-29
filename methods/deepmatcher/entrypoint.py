@@ -2,7 +2,6 @@ import sys
 sys.path.append('fork-deepmatcher')
 
 import argparse
-import resource
 import time
 import os
 import pathtype
@@ -49,20 +48,20 @@ train, test = datasets[0], datasets[1] if len(datasets) >= 2 else None
 # Step 2. Run the method
 model = dm.MatchingModel()
 
-start_time = time.time()
+start_time = time.process_time()
 model.run_train(train, test, epochs=args.epochs)
-train_time = time.time() - start_time
-train_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+train_time = time.process_time() - start_time
 
-t_start = time.time()
+start_time = time.process_time()
 stats = model.run_eval(test, return_stats=True)
-test_time = time.time() - start_time
-test_max_mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+# FIXME: should we include generating predictions to eval_time?
+predictions = model.run_prediction(test, output_attributes=True)
+eval_time = time.process_time() - start_time
 
 # delete temporary files without tableA_id, tableB_id columns
 os.remove(os.path.join(args.output, 'train.csv'))
 os.remove(os.path.join(args.output, 'test.csv'))
 
 # Step 3. Convert the output into a common format
-transform_output(stats, test_time, test_max_mem, args.output)
+transform_output(predictions, stats, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))

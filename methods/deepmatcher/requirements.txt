@@ -1,15 +1,12 @@
-pathtype
-pandas
+pathtype==1.0.0
+pandas==1.3.5
 
 # deepmatcher requirements
-torch>=1.10
-tqdm
-pyprind
-six
-Cython
-torchtext>=0.9
-nltk>=3.2.5
-fasttext
-pandas
-dill
-scikit-learn
+tqdm==4.61.2
+pyprind==2.11.3
+six==1.16.0
+torchtext==0.11.0
+nltk==3.8.1
+fasttext==0.9.3
+dill==0.3.7
+scikit-learn==1.0.2
