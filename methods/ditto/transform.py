@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-
 import os
 import sys
 
@@ -68,6 +61,7 @@ def generate_candidates(tableA_df, tableB_df, matches_df, seed):
     pairs['_id'] = np.arange(pairs.shape[0])
     return pairs
 
+
 def join_columns (table, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
     agg_table = pd.DataFrame()
     for prefix in prefixes:
@@ -94,6 +88,7 @@ def join_columns (table, columns_to_join=None, separator=' ', prefixes=['tableA_
     return pd.concat([agg_table, table['label']], axis=1),\
         pd.concat([table[prefixes[0] + 'id'], table[prefixes[1] + 'id']], axis=1)
 
+
 def transform_input(source_dir, output_dir, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
     train_df = pd.read_csv(os.path.join(source_dir, 'train.csv'), encoding_errors='replace')
     test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
@@ -106,7 +101,6 @@ def transform_input(source_dir, output_dir, columns_to_join=None, separator=' ',
     train.to_csv(train_file, '\t', header=False, index=False)
     test.to_csv(test_file, '\t', header=False, index=False)
     return train_file, test_file, train_id, test_id
-
 
 
 def transform_input_old(source_dir, output_dir, recall, seed):
@@ -136,22 +130,11 @@ def transform_input_old(source_dir, output_dir, recall, seed):
     return train_file, test_file, train_id, test_id
 
 
-def transform_output(predictions, ids, labels, runtime, dest_dir):
+def transform_output(predictions, ids, labels, train_time, eval_time, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
-    metrics.csv: f1, precision, recall, time (1 row, 4 columns, with header)
+    metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
     predictions.csv: tableA_id, tableB_id, etc. (should have at least 2 columns and a header row)
-
-    Parameters
-    ----------
-    predictions_df : pd.DataFrame
-        Output of the Matcher contains the match/non-match prediction and the
-        true label for each pair in the test set.
-        Has at least the columns tableA_id, tableB_id, prediction, label.
-    runtime : float
-        Measured runtime of the matcher in seconds.
-    dest_dir : str
-        Directory name where the output should be stored.
     """
 
     # get the actual candidates (entity pairs with prediction 1)
@@ -159,8 +142,7 @@ def transform_output(predictions, ids, labels, runtime, dest_dir):
     #predictions_df = pd.concat([predictions, ids, labels], axis=1)
     #predictions_df.columns = ['prediction', 'tableA_id', 'tableB_id', 'label']
     print(predictions_df)
-    
-    
+
     candidate_table = predictions_df[predictions_df['prediction'] == 1]
     print(candidate_table)
     # save candidate pair IDs to predictions.csv
@@ -175,12 +157,12 @@ def transform_output(predictions, ids, labels, runtime, dest_dir):
     precision = true_positives / num_candidates
     f1 = 2 * precision * recall / (precision + recall)
 
-    # save evaluation metrics to metrics.csv
     pd.DataFrame({
         'f1': [f1],
         'precision': [true_positives / num_candidates],
         'recall': [true_positives / ground_truth],
-        'time': [runtime],
+        'train_time': [train_time],
+        'eval_time': [eval_time],
     }).to_csv(os.path.join(dest_dir, 'metrics.csv'), index=False)
     return None
 

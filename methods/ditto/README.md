@@ -35,10 +35,17 @@ srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datas
 ## Last error
 
 ```bash
-Input directory:  ['tableA.csv', 'test.csv', 'tableB.csv', 'train.csv', 'matches.csv']
-Traceback (most recent call last):
-  File "/srv/entrypoint.py", line 45, in <module>
-    print("Output directory: ", os.listdir(args.output))
-FileNotFoundError: [Errno 2] No such file or directory: 'output'
-srun: error: gpunode06: task 0: Exited with exit code 1
+  File "/srv/entrypoint.py", line 53, in <module>
+    trainset, testset, train_ids, test_ids = transform_input_old(args.input, temp_output, args.recall, seed=args.seed)
+  File "/srv/transform.py", line 127, in transform_input_old
+    pairs = generate_candidates(tableA_df, tableB_df, matches_df, seed)
+  File "/srv/transform.py", line 28, in generate_candidates
+    (cand_tableB.iloc[matches_df['tableB_id']]).reset_index(drop=True)
+  File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 931, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+  File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 1557, in _getitem_axis
+    return self._get_list_axis(key, axis=axis)
+  File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 1533, in _get_list_axis
+    raise IndexError("positional indexers are out-of-bounds") from err
+IndexError: positional indexers are out-of-bounds
 ```

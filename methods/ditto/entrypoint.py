@@ -1,4 +1,5 @@
 import os
+import pathtype
 import argparse
 import random
 import sys
@@ -22,19 +23,18 @@ from scipy.special import softmax
 
 
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
-parser.add_argument('input', nargs='?', default='datasets/d2_abt_buy',
+parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                     help='Input directory containing the dataset')
-parser.add_argument('temp_output', nargs='?', default='output/temp',
-                    help='directory to save temporary files')
-parser.add_argument('output', nargs='?', default='output',
+parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', default='/data/output',
                     help='Output directory to store the output')
 parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.8,
                     help='Recall value used to select ground truth pairs')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
-parser.add_argument("--run_id", type=int, default=0)
+parser.add_argument('--run_id', type=int, default=0)
 
-parser.add_argument("--model", type=str, default='distilbert')
+parser.add_argument('-m', '--model', type=str, default='distilbert',
+                    help='The model to use')
 parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,
                     help='Number of epochs to train the model')
 
@@ -44,11 +44,14 @@ print("Hi, I'm DITTO entrypoint!")
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
+temp_output = os.path.join(args.output, 'temp')
+os.makedirs(temp_output, exist_ok=True)
+
 # Step 1. Convert input data into the format expected by the method
 print("Method input: ", os.listdir(args.input))
 prefix_1 = 'tableA_'
 prefix_2 = 'tableB_'
-trainset, testset, train_ids, test_ids = transform_input_old(args.input, args.temp_output, args.recall, seed=args.seed)
+trainset, testset, train_ids, test_ids = transform_input_old(args.input, temp_output, args.recall, seed=args.seed)
 
 hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'n_epochs', #number of epochs
@@ -71,7 +74,7 @@ hp = hyperparameters(lm = args.model,
                      max_len = 256,
                      lr = 3e-5,
                      save_model = False,
-                     logdir = args.temp_output,
+                     logdir = temp_output,
                      fp16 = False,
                      da = 'all',
                      alpha_aug = 0.8,
@@ -139,30 +142,21 @@ train_dataset = DittoDataset(trainset,
 test_dataset = DittoDataset(testset, lm=args.model)
 
 # train and evaluate the model
-matcher = train(train_dataset,
-      run_tag, hp)
+start_time = time.process_time()
+matcher = train(train_dataset, run_tag, hp)
+train_time = time.process_time() - start_time
 
 pairs = []
-
 threshold = 0.5
-
-
-
 
 # batch processing
 out_data = []
-start_time = time.time()
+start_time = time.process_time()
 predictions, logits = classify(test_dataset, matcher, lm=hp.lm,
                                batch_size = hp.batch_size,
                                max_len=hp.max_len,
                                threshold=threshold)
 scores = softmax(logits, axis=1)
+eval_time = time.process_time() - start_time
 
-runtime = 0
-transform_output(predictions, test_ids, test_dataset.labels, runtime, args.output)
-
-
-
-run_time = time.time() - start_time
-run_tag = '%s_lm=%s_dk=%s_su=%s' % (task, hp.lm, str(hp.dk != None), str(hp.summarize != None))
-os.system('echo %s %f >> log.txt' % (run_tag, run_time))
+transform_output(predictions, test_ids, test_dataset.labels, train_time, eval_time, args.output)
