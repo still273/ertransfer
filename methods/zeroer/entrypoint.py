@@ -62,12 +62,12 @@ true_labels = cand_features.gold.values
 if np.sum(true_labels)==0:
     true_labels = None
 
-start_time = time.perf_counter()
+start_time = time.process_time()
 y_pred = utils.run_zeroer(sim_features, sim_features_lr,id_dfs,
                     true_labels ,True,False,args.transitivity)
-end_time = time.perf_counter()
+eval_time = time.process_time() - start_time
 
 pred_df = cand_features.copy()
 pred_df['pred'] = y_pred
 
-transform_output(pred_df, end_time-start_time, args.output)
+transform_output(pred_df, 0, eval_time, args.output)

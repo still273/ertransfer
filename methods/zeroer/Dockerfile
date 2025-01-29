@@ -12,5 +12,5 @@ RUN conda env create -f environment.yml
 COPY *.py .
 
 # This allows to run the container as `docker run --rm <yourImageName> <args>`
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ZeroER", "python3", "-u", "entrypoint.py"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ZeroER", "python", "-u", "entrypoint.py"]
 CMD []

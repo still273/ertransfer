@@ -28,8 +28,5 @@ From: continuumio/miniconda3
     cd /srv
     conda env create -f environment.yml
 
-%environment
-    export PYTHONPATH="${PYTHONPATH}:/srv/fork-deepmatcher"
-
 %runscript
-    exec conda run --no-capture-output -n ZeroER python3 -u entrypoint.py "$@"
+    exec conda run --no-capture-output -n ZeroER python -u /srv/entrypoint.py "$@"

@@ -1,18 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 16 11:09:50 2024
-
-@author: franziska
-"""
-
 import os
 import sys
 
 import pandas as pd
 import numpy as np
 import utils
-
 
 
 def transform_input(source_dir, prefixes=['tableA_', 'tableB_'], use_full=True):
@@ -49,23 +40,11 @@ def transform_input(source_dir, prefixes=['tableA_', 'tableB_'], use_full=True):
     return (train_df, test_df), tableA_df, tableB_df, matches_df
 
 
-
-def transform_output(predictions, runtime, dest_dir):
+def transform_output(predictions, train_time, eval_time, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
-    metrics.csv: f1, precision, recall, time (1 row, 4 columns, with header)
+    metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
     predictions.csv: tableA_id, tableB_id, etc. (should have at least 2 columns and a header row)
-
-    Parameters
-    ----------
-    predictions_df : pd.DataFrame
-        Output of the Matcher contains the match/non-match prediction and the
-        true label for each pair in the test set.
-        Has at least the columns tableA_id, tableB_id, prediction, label.
-    runtime : float
-        Measured runtime of the matcher in seconds.
-    dest_dir : str
-        Directory name where the output should be stored.
     """
 
     predictions['prediction'] = np.round(np.clip(predictions['pred'] + utils.DEL, 0., 1.)).astype(int)
@@ -87,13 +66,14 @@ def transform_output(predictions, runtime, dest_dir):
     precision = true_positives / num_candidates
     f1 = 2 * precision * recall / (precision + recall)
 
-    # save evaluation metrics to metrics.csv
     pd.DataFrame({
         'f1': [f1],
         'precision': [true_positives / num_candidates],
         'recall': [true_positives / ground_truth],
-        'time': [runtime],
+        'train_time': [train_time],
+        'eval_time': [eval_time],
     }).to_csv(os.path.join(dest_dir, 'metrics.csv'), index=False)
+
     return None
 
 
