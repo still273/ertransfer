@@ -10,3 +10,6 @@
 [submodule "methods/gnem/fork-gnem"]
 	path = methods/gnem/fork-gnem
 	url = git@github.com:erbench/fork-gnem.git
+[submodule "methods/zeroer/fork-zeroer"]
+	path = methods/zeroer/fork-zeroer
+	url = git@github.com:erbench/fork-zeroer.git

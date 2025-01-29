@@ -9,6 +9,7 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 
 # this should be after pip install, to cache layers more efficient
+COPY fork-zeroer .
 COPY *.py .
 
 # This allows to run the container as `docker run --rm <yourImageName> <args>`

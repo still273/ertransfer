@@ -11,14 +11,11 @@ From: continuumio/miniconda3
 
 %files
     environment.yml /srv
+    fork-zeroer /srv
     entrypoint.py /srv
-    feature_extraction.py /srv
-    magellan_modified_feature_generation.py /srv
     model.py /srv
     transform_datasets.py /srv
     transform.py /srv
-    utils.py /srv
-    __init__.py /srv
 
 %post
     apt-get update --allow-insecure-repositories && \

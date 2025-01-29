@@ -1,3 +1,6 @@
+import sys
+sys.path.append('fork-zeroer')
+
 import argparse
 #import pathtype
 import random
@@ -5,7 +8,7 @@ import os
 
 import py_entitymatching as em
 from transform import transform_input, transform_output
-from feature_extraction import gather_features_and_labels, gather_similarity_features
+from data_loading_helper.feature_extraction import gather_features_and_labels, gather_similarity_features
 import numpy as np
 import utils
 import time
