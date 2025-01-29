@@ -13,6 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python -m spacy download en_core_web_lg
 RUN python -m nltk.downloader stopwords
 
+COPY fork-ditto .
 COPY *.py .
 
 # This allows to run the container as `docker run --rm <yourImageName> <args>`

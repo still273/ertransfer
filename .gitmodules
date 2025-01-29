@@ -13,3 +13,6 @@
 [submodule "methods/zeroer/fork-zeroer"]
 	path = methods/zeroer/fork-zeroer
 	url = git@github.com:erbench/fork-zeroer.git
+[submodule "methods/ditto/fork-ditto"]
+	path = methods/ditto/fork-ditto
+	url = git@github.com:erbench/fork-ditto.git

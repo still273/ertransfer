@@ -11,6 +11,7 @@ From: pytorch/pytorch:1.9.1-cuda11.1-cudnn8-runtime
 
 %files
     requirements.txt /srv
+    fork-ditto /srv
     entrypoint.py /srv
     augment.py /srv
     configs.json /srv

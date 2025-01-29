@@ -1,3 +1,6 @@
+import sys
+sys.path.append('fork-ditto')
+
 import os
 import pathtype
 import argparse
@@ -7,7 +10,6 @@ import torch
 import numpy as np
 from collections import namedtuple
 import time
-
 
 from transform import transform_input_old, transform_output
 
