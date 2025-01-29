@@ -31,9 +31,9 @@ excl_attributes = ['_id', 'ltable_id', 'rtable_id', 'label']
 def add_catalog_information(df, tableA, tableB):
     em.set_ltable(df, tableA)
     em.set_rtable(df, tableB)
-    em.set_fk_ltable(df, excl_attributes[1])
-    em.set_fk_rtable(df, excl_attributes[2])
-    em.set_key(df, excl_attributes[0])
+    em.set_fk_ltable(df, 'ltable_id')
+    em.set_fk_rtable(df, 'rtable_id')
+    em.set_key(df, '_id')
     
 read_prefixes = ['tableA_', 'tableB_']
 

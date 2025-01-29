@@ -23,20 +23,25 @@ def transform_input(source_dir, prefixes=['tableA_', 'tableB_'], use_full=True):
     
     train_df = pd.read_csv(os.path.join(source_dir, 'train.csv'))
     test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'))
+
     
     if use_full:
         pair_df = pd.concat([train_df, test_df])
         pair_df.rename(lambda x: x.replace(prefixes[0], 'ltable_'), axis='columns', inplace=True)
         pair_df.rename(lambda x: x.replace(prefixes[1], 'rtable_'), axis='columns', inplace=True)
+
+        pair_df['_id'] = np.arange(pair_df.shape[0])
         
         return pair_df, tableA_df, tableB_df, matches_df
     
     
     train_df.rename(lambda x: x.replace('tableA', 'ltable'), axis='columns', inplace=True)
     train_df.rename(lambda x: x.replace('tableB', 'rtable'), axis='columns', inplace=True)
+    train_df['_id'] = np.arange(train_df.shape[0])
     
     test_df.rename(lambda x: x.replace('tableA', 'ltable'), axis='columns', inplace=True)
     test_df.rename(lambda x: x.replace('tableB', 'rtable'), axis='columns', inplace=True)
+    test_df['_id'] = np.arange(test_df.shape[0])
     
     matches_df.rename(lambda x: x.replace('tableA', 'ltable'), axis='columns', inplace=True)
     matches_df.rename(lambda x: x.replace('tableB', 'rtable'), axis='columns', inplace=True)
