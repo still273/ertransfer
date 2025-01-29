@@ -1,5 +1,7 @@
 import argparse
+import pathtype
 import os
+import shutil
 import random
 import time
 
@@ -14,19 +16,20 @@ from transform import transform_input, transform_output
 import torch
 
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
-parser.add_argument('input', nargs='?', default='datasets/d2_abt_buy',
+parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                     help='Input directory containing the dataset')
-parser.add_argument('output', nargs='?', default='output',
+parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', default='/data/output',
                     help='Output directory to store the output')
 parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.8,
                     help='Recall value used to select ground truth pairs')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
 
-parser.add_argument('--model', default='bert', type=str)  # roberta
+parser.add_argument('-m', '--model', default='bert', type=str)  # roberta
 parser.add_argument('--max_seq_length', default=128, type=int)  # 180
 parser.add_argument('--train_batch_size', default=8, type=int)  # 16
-parser.add_argument('--num_epochs', default=1.0, type=float)  # 15.0
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,  # 15.0
+                    help='Number of epochs to train the model')
 
 args = parser.parse_args()
 
@@ -48,6 +51,7 @@ device, n_gpu = torch.device("cpu"), 0
 label_list = [0, 1]
 print("training with {} labels: {}".format(len(label_list), label_list))
 
+# Step 2. Run the method
 config_class, model_class, tokenizer_class = Config.MODEL_CLASSES[args.model]
 if args.model == 'bert':
     model_path = "textattack/bert-base-uncased-yelp-polarity"
@@ -85,7 +89,7 @@ training_data_loader = load_data(train_examples,
                                  args.train_batch_size,
                                  DataType.TRAINING, args.model)
 
-num_train_steps = len(training_data_loader) * args.num_epochs
+num_train_steps = len(training_data_loader) * args.epochs
 
 optimizer, scheduler = build_optimizer(model,
                                        num_train_steps,
@@ -94,21 +98,20 @@ optimizer, scheduler = build_optimizer(model,
                                        0,
                                        0.0)
 
-t1 = time.perf_counter()
+start_time = time.process_time()
 train(device,
       training_data_loader,
       model,
       optimizer,
       scheduler,
       None,
-      args.num_epochs,
+      args.epochs,
       1.0,
       False,
       experiment_name=args.model,
       output_dir=args.output,
       model_type=args.model)
-t2 = time.perf_counter()
-training_time = t2 - t1
+train_time = time.process_time() - start_time
 
 # Testing
 test_examples = [InputExample(i, row[prefix_1 + 'AgValue'], row[prefix_2 + 'AgValue'], row['label']) for i, row
@@ -125,19 +128,18 @@ include_token_type_ids = False
 if args.model == 'bert':
     include_token_type_ids = True
 
-t1 = time.perf_counter()
-simple_accuracy, f1, classification_report, prfs, predictions = predict(model, device, test_data_loader,
-                                                                        include_token_type_ids)
-t2 = time.perf_counter()
-testing_time = t2 - t1
+start_time = time.process_time()
+simple_accuracy, f1, classification_report, prfs, predictions = predict(model, device, test_data_loader, include_token_type_ids)
+eval_time = time.process_time() - start_time
 
 keys = ['precision', 'recall', 'fbeta_score', 'support']
 prfs = {f'class_{no}': {key: float(prfs[nok][no]) for nok, key in enumerate(keys)} for no in range(2)}
 
 print(classification_report)
 
-# delete temporary files
-if os.path.exists(os.path.join(args.output, args.model)):
-    os.remove(os.path.join(args.output, args.model))
+# Step 3. Convert the output into a common format
+transform_output(predictions, test_df, train_time, eval_time, args.output)
 
-transform_output(predictions, test_df, training_time + testing_time, args.output)
+# Step 4. Delete temporary files
+if os.path.exists(os.path.join(args.output, args.model)):
+    shutil.rmtree(os.path.join(args.output, args.model))

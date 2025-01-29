@@ -58,10 +58,10 @@ stats = model.run_eval(test, return_stats=True)
 predictions = model.run_prediction(test, output_attributes=True)
 eval_time = time.process_time() - start_time
 
-# delete temporary files without tableA_id, tableB_id columns
-os.remove(os.path.join(args.output, 'train.csv'))
-os.remove(os.path.join(args.output, 'test.csv'))
-
 # Step 3. Convert the output into a common format
 transform_output(predictions, stats, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))
+
+# Step 4. Delete temporary files
+os.remove(os.path.join(args.output, 'train.csv'))
+os.remove(os.path.join(args.output, 'test.csv'))
