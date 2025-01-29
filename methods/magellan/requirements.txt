@@ -1,4 +1,4 @@
-pathtype
+pathtype==1.0.0
 numpy==1.23.4
 pandas==1.5.1
-py-entitymatching
+py-entitymatching==0.4.2

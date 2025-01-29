@@ -53,8 +53,6 @@ add_catalog_information(train, tableA, tableB)
 add_catalog_information(test, tableA, tableB)
 
 # Step 2. Run the method
-t_start = time.perf_counter()
-
 # https://nbviewer.org/github/anhaidgroup/py_entitymatching/blob/master/notebooks/guides/step_wise_em_guides/Selecting%20the%20Best%20Learning%20Matcher.ipynb
 
 if args.method == "DecisionTree":
@@ -112,12 +110,16 @@ test_f_vectors[feature_columns] = X_test_scaled
 #                             target_attr='label', metric_to_select_matcher='f1', random_state=RANDOMSTATE)
 # print(result['cv_stats'])
 
+
+start_time = time.process_time()
 matcher.fit(table=train_f_vectors, exclude_attrs=excl_attributes, target_attr='label')
+train_time = time.process_time() - start_time
+
+start_time = time.process_time()
 prediction = matcher.predict(table=test_f_vectors, exclude_attrs=excl_attributes, append=True, return_probs=True,
                              inplace=False, target_attr='prediction', probs_attr='probability')
-
-t_stop = time.perf_counter()
+eval_time = time.process_time() - start_time
 
 # Step 3. Convert the output into a common format
-transform_output(prediction, t_stop - t_start, args.output)
+transform_output(prediction, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))
