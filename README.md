@@ -28,10 +28,10 @@ wget https://zenodo.org/record/6466387/files/wiki.en.bin -O embedding/wiki.en.bi
 |--------------------------------------------------|------------|------------------------|--------------------------------|-------------|
 | [splitter-simple](splitter-simple/README.md)     | ok         | ok, no GPU Utilization | ok                             |             |
 | [splitter](splitter/README.md)                   | ok         | ok                     | ok                             |             |
-| [deepmatcher](methods/deepmatcher/README.md)     | ok         | ok                     | predictions missing            | Franziska   |
+| [deepmatcher](methods/deepmatcher/README.md)     | ok         | ok                     | ok                             |             |
 | [ditto](methods/ditto/README.md)                 | ok         | fails                  |                                | Oleh        |
 | [emtransformer](methods/emtransformer/README.md) | ok         | ok, no GPU Utilization | scores eq 0, predictions empty | Franziska   |
 | [gnem](methods/gnem/README.md)                   | ok         | ok                     | no eval time                   |             |
-| [hiermatcher](methods/hiermatcher/README.md)     | ok         | ok                     | predictions missing            | Franziska   |
+| [hiermatcher](methods/hiermatcher/README.md)     | ok         | ok                     | ok                             | ok          |
 | [magellan](methods/magellan/README.md)           | ok         | ok, no GPU Utilization | ok                             |             |
 | [zeroer](methods/zeroer/README.md)               | ok         | ok, no GPU Utilization | no train time                  |             |
