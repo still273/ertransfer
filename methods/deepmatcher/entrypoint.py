@@ -26,11 +26,11 @@ print("Hi, I'm DeepMatcher entrypoint!")
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
-train = pd.read_csv(os.path.join(args.input, 'train.csv'), encoding_errors='replace')
-test = pd.read_csv(os.path.join(args.input, 'test.csv'), encoding_errors='replace')
+train_data = pd.read_csv(os.path.join(args.input, 'train.csv'), encoding_errors='replace')
+test_data = pd.read_csv(os.path.join(args.input, 'test.csv'), encoding_errors='replace')
 
-train.drop(columns=['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'train.csv'), index_label='id')
-test.drop(columns=['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'test.csv'), index_label='id')
+train_data.drop(columns=['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'train.csv'), index_label='id')
+test_data.drop(columns=['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'test.csv'), index_label='id')
 
 # Step 1. Convert input data into the format expected by the method
 datasets = dm.data.process(path=args.output,
@@ -53,15 +53,16 @@ model.run_train(train, test, epochs=args.epochs)
 train_time = time.process_time() - start_time
 
 start_time = time.process_time()
-stats = model.run_eval(test, return_stats=True)
+predictions, stats = model.run_eval(test, return_stats=True, return_predictions=True)
 # FIXME: should we include generating predictions to eval_time?
-predictions = model.run_prediction(test, output_attributes=True)
+#predictions = model.run_prediction(test, output_attributes=True)
 eval_time = time.process_time() - start_time
 
 # Step 3. Convert the output into a common format
-transform_output(predictions, stats, train_time, eval_time, args.output)
-print("Final output: ", os.listdir(args.output))
+transform_output(predictions,test_data, stats, train_time, eval_time, args.output)
 
 # Step 4. Delete temporary files
 os.remove(os.path.join(args.output, 'train.csv'))
 os.remove(os.path.join(args.output, 'test.csv'))
+
+print("Final output: ", os.listdir(args.output))
