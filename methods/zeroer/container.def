@@ -10,11 +10,8 @@ From: continuumio/miniconda3
     It requires 2 arguments: path to the input directory, path to the output directory.
 
 %files
-    environment.yml /srv
     fork-zeroer /srv
     entrypoint.py /srv
-    model.py /srv
-    transform_datasets.py /srv
     transform.py /srv
 
 %post
@@ -23,7 +20,7 @@ From: continuumio/miniconda3
         rm -rf /var/lib/apt/lists/*
 
     cd /srv
-    conda env create -f environment.yml
+    conda env create -f fork-zeroer/environment.yml
 
 %runscript
     exec conda run --no-capture-output -n ZeroER python -u /srv/entrypoint.py "$@"
