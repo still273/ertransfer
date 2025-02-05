@@ -45,8 +45,8 @@ columns_to_join = None
 test_df, train_df = transform_input(args.input, columns_to_join, ' ', [prefix_1, prefix_2])
 print(test_df.columns, train_df.columns)
 
-#device, n_gpu = initialize_gpu_seed(args.seed)
-device, n_gpu = torch.device("cpu"), 0
+device, n_gpu = initialize_gpu_seed(args.seed)
+#device, n_gpu = torch.device("cpu"), 0
 
 label_list = [0, 1]
 print("training with {} labels: {}".format(len(label_list), label_list))

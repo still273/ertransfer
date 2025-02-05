@@ -27,8 +27,8 @@ WARNING: This method doesn't use GPUs.
 ```bash
 mkdir -p ../../apptainer ../../output/emtransformer
 apptainer build ../../apptainer/emtransformer.sif container.def
-srun apptainer run ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
+srun --gpus=1 apptainer run ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
 
 # dev mode with bind
-srun apptainer run --bind ./:/srv ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
+srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/emtransformer.sif ../../datasets/d2_abt_buy/ ../../output/emtransformer/
 ```

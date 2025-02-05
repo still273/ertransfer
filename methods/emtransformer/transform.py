@@ -7,12 +7,10 @@ import pandas as pd
 def join_columns(table, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
     agg_table = pd.DataFrame()
     for prefix in prefixes:
-        print(columns_to_join)
         if columns_to_join == None:
             columns = [column for column in table.columns if (column != prefix + 'id' and prefix in column)]
         else:
             columns = [prefix + column for column in columns_to_join]
-        print(columns)
 
         red_table = table.loc[:, columns]
         red_table = red_table.fillna('')
