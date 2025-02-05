@@ -119,11 +119,12 @@ neg = 2.0 / (1.0 + pos_neg_ratio)
 criterion = nn.CrossEntropyLoss(weight=torch.Tensor([neg, pos])).to(embedmodel.device)
 
 start_time = time.process_time()
-f1s, ps, rs, score_dicts = train(train_iter, model_dir, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
+f1s, ps, rs, score_dicts, time_m = train(train_iter, model_dir, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
       scheduler=scheduler, log_freq=5, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'])
-train_time = time.process_time() - start_time
+eval_time = time.process_time() - time_m
+train_time =  time_m - start_time
 
-transform_output(score_dicts, f1s, ps, rs, train_time, 0, args.output)
+transform_output(score_dicts, f1s, ps, rs, train_time, eval_time, args.output)
 
 # Step 4. Delete temporary files
 os.remove(os.path.join(args.output, 'train.csv'))
