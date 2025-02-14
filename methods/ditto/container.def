@@ -22,7 +22,6 @@ From: pytorch/pytorch:1.9.1-cuda11.1-cudnn8-runtime
     matcher.py /srv
     summarize.py /srv
     transform.py /srv
-    __init__.py /srv
 
 %post
     apt-get update --allow-insecure-repositories && \

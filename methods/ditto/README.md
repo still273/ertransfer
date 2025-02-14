@@ -35,11 +35,12 @@ srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datas
 ## Last error
 
 ```bash
-  File "/srv/entrypoint.py", line 53, in <module>
+Traceback (most recent call last):
+  File "/srv/entrypoint.py", line 56, in <module>
     trainset, testset, train_ids, test_ids = transform_input_old(args.input, temp_output, args.recall, seed=args.seed)
-  File "/srv/transform.py", line 127, in transform_input_old
+  File "/srv/transform.py", line 121, in transform_input_old
     pairs = generate_candidates(tableA_df, tableB_df, matches_df, seed)
-  File "/srv/transform.py", line 28, in generate_candidates
+  File "/srv/transform.py", line 21, in generate_candidates
     (cand_tableB.iloc[matches_df['tableB_id']]).reset_index(drop=True)
   File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 931, in __getitem__
     return self._getitem_axis(maybe_callable, axis=axis)
