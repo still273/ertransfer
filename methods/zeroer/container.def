@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: continuumio/miniconda3
+From: python:3.7
 
 %labels
     Author Oleh Astappiev, Franziska Neuhof
@@ -11,6 +11,7 @@ From: continuumio/miniconda3
 
 %files
     fork-zeroer /srv
+    requirements.txt /srv
     entrypoint.py /srv
     transform.py /srv
 
@@ -20,7 +21,7 @@ From: continuumio/miniconda3
         rm -rf /var/lib/apt/lists/*
 
     cd /srv
-    conda env create -f fork-zeroer/environment.yml
+    pip install --no-cache-dir -r requirements.txt -r fork-zeroer/requirements.txt
 
 %runscript
-    exec conda run --no-capture-output -n ZeroER python -u /srv/entrypoint.py "$@"
+    exec python -u /srv/entrypoint.py "$@"

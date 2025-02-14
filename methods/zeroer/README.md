@@ -3,7 +3,18 @@
 https://github.com/nishadi/zeroer
 entrypoint.py based on zeroer.py
 
+!> This method does not use GPU acceleration.
+
 ## How to use
+
+```bash
+conda create -n zeroer python=3.7
+conda activate zeroer
+pip install -r requirements.txt -r fork-zeroer/requirements.txt
+python -u entrypoint.py ../../datasets/d2_abt_buy/ ../../output/zeroer/
+```
+
+### Docker
 
 You can directly execute the docker image as following:
 
@@ -20,13 +31,13 @@ You can override the input and output directories by providing them as arguments
 docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/output zeroer /data/input /data/output
 ```
 
-## Apptainer
+### Apptainer
 
 ```bash
 mkdir -p ../../apptainer ../../output/zeroer
 apptainer build ../../apptainer/zeroer.sif container.def
-srun --gpus=1 apptainer run ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
+srun apptainer run ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
 
 # dev mode with bind
-srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
+srun apptainer run --bind ./:/srv ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
 ```

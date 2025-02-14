@@ -2,7 +2,7 @@ import sys
 sys.path.append('fork-zeroer')
 
 import argparse
-#import pathtype
+import pathtype
 import os
 
 import py_entitymatching as em
@@ -13,9 +13,9 @@ import utils
 import time
 
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
-parser.add_argument('input', nargs='?', default='datasets/d2_abt_buy', #type=pathtype.Path(readable=True),
+parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                     help='Input directory containing the dataset')
-parser.add_argument('output',  nargs='?', default='output', #type=pathtype.Path(writable=True),
+parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', default='/data/output',
                     help='Output directory to store the output')
 parser.add_argument('-T', '--transitivity', action='store_true',
                     help="whether to enforce transitivity constraint")
