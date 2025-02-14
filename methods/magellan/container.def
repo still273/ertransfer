@@ -19,4 +19,4 @@ From: python:3.11
     pip install --no-cache-dir -r requirements.txt
 
 %runscript
-    exec python -u /srv/entrypoint.py  "$@"
+    exec python -u /srv/entrypoint.py "$@"
