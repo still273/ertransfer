@@ -18,7 +18,7 @@ parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', defa
                     help='Output directory to store the output')
 parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='/workspace/embedding',
                     help='The directory where embeddings are stored')
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()

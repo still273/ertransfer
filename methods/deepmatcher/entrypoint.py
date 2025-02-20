@@ -9,6 +9,7 @@ import pathtype
 import pandas as pd
 import deepmatcher as dm
 from transform import transform_output
+import torch
 
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
 parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
@@ -17,7 +18,7 @@ parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', defa
                     help='Output directory to store the output')
 parser.add_argument('embedding', type=pathtype.Path(readable=True), nargs='?', default='/workspace/embedding',
                     help='The directory where embeddings are stored')
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()
@@ -54,8 +55,6 @@ train_time = time.process_time() - start_time
 
 start_time = time.process_time()
 predictions, stats = model.run_eval(test, return_stats=True, return_predictions=True)
-# FIXME: should we include generating predictions to eval_time?
-#predictions = model.run_prediction(test, output_attributes=True)
 eval_time = time.process_time() - start_time
 
 # Step 3. Convert the output into a common format

@@ -1,15 +1,24 @@
 import os
 import pandas as pd
+import torch
 
 
 def transform_output(predictions, data, stats, train_time, eval_time, dest_dir):
+    sm = torch.nn.Softmax(dim=1)
     predictions = pd.DataFrame(predictions, columns=['id', 'score1', 'score2'])
     predictions['id'] = predictions['id'].astype(int)
-    predictions = predictions[predictions['score2'] > predictions['score1']]
+
+    probs = torch.Tensor(predictions[['score1', 'score2']].to_numpy())
+    probs = sm(probs)
+    predictions['prob_class1'] = probs[:, 1].tolist()
+
+    #predictions = predictions[predictions['score2'] > predictions['score1']]
     predictions['tableA_id'] = data.loc[predictions['id'], 'tableA_id']
     predictions['tableB_id'] = data.loc[predictions['id'], 'tableB_id']
+    predictions['label'] = data.loc[predictions['id'], 'label']
 
-    predictions.loc[:, ['tableA_id', 'tableB_id']].to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
+    predictions.loc[:, ['tableA_id', 'tableB_id', 'label', 'prob_class1']].to_csv(
+        os.path.join(dest_dir, 'predictions.csv'), index=False)
 
     pd.DataFrame({
         'f1': [stats.f1().item()],
