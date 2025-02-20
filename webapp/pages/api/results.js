@@ -14,8 +14,16 @@ export default async function handler(req, res) {
         f1: req.body.f1,
         precision: req.body.precision,
         recall: req.body.recall,
-        maxMem: req.body.maxMem,
-        elapsed: req.body.elapsed,
+        trainTime: req.body.trainTime,
+        evalTime: req.body.evalTime,
+
+        cpuUtilized: req.body.cpuUtilized,
+        memoryUtilized: req.body.memoryUtilized,
+        gpuAllocated: req.body.gpuAllocated,
+        gpuUtilized: req.body.gpuUtilized,
+        gpuMemUtilized: req.body.gpuMemUtilized,
+        energyConsumed: req.body.energyConsumed,
+        totalRuntime: req.body.totalRuntime,
       }
     });
 
