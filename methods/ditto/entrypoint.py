@@ -11,14 +11,14 @@ import numpy as np
 from collections import namedtuple
 import time
 
-from transform import transform_input_old, transform_output
+from transform import transform_input, transform_output
 
 sys.path.insert(0, "Snippext_public")
 
-from dataset import DittoDataset
-from summarize import Summarizer
-from knowledge import ProductDKInjector, GeneralDKInjector
-from ditto import train
+from ditto_light.dataset import DittoDataset
+from ditto_light.summarize import Summarizer
+from ditto_light.knowledge import ProductDKInjector, GeneralDKInjector
+from ditto_light.ditto import train
 from matcher import classify, tune_threshold
 
 from scipy.special import softmax
@@ -53,7 +53,7 @@ os.makedirs(temp_output, exist_ok=True)
 print("Method input: ", os.listdir(args.input))
 prefix_1 = 'tableA_'
 prefix_2 = 'tableB_'
-trainset, testset, train_ids, test_ids = transform_input_old(args.input, temp_output, args.recall, seed=args.seed)
+trainset, testset, train_ids, test_ids = transform_input(args.input, temp_output, prefixes=[prefix_1, prefix_2])
 
 hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'n_epochs', #number of epochs
@@ -77,7 +77,7 @@ hp = hyperparameters(lm = args.model,
                      lr = 3e-5,
                      save_model = False,
                      logdir = temp_output,
-                     fp16 = False,
+                     fp16 = True,
                      da = 'all',
                      alpha_aug = 0.8,
                      dk = 'general',
@@ -117,18 +117,24 @@ run_tag = run_tag.replace('/', '_')
 # #validset = config['validset']
 # testset = config['testset']
 
+config = {"task_type": "classification",
+  "vocab": ["0", "1"],
+  "trainset": os.path.join(temp_output, 'train.txt'),
+  #"validset":os.path.join(temp_output, 'train.txt'),
+  "testset": os.path.join(temp_output, 'test.txt')}
+
 # summarize the sequences up to the max sequence length
 if hp.summarize:
-    summarizer = Summarizer([trainset], lm=args.model)
+    summarizer = Summarizer(config, lm=args.model)
     trainset = summarizer.transform_file(trainset, max_len=hp.max_len)
     #validset = summarizer.transform_file(validset, max_len=args.max_len)
     testset = summarizer.transform_file(testset, max_len=hp.max_len)
 
 if hp.dk is not None:
     if hp.dk == 'product':
-        injector = ProductDKInjector(hp.dk)
+        injector = ProductDKInjector(config, hp.dk)
     else:
-        injector = GeneralDKInjector(hp.dk)
+        injector = GeneralDKInjector(config, hp.dk)
 
     trainset = injector.transform_file(trainset)
     #validset = injector.transform_file(validset)
@@ -145,7 +151,8 @@ test_dataset = DittoDataset(testset, lm=args.model)
 
 # train and evaluate the model
 start_time = time.process_time()
-matcher = train(train_dataset, run_tag, hp)
+print('start training')
+matcher = train(train_dataset,None, None, run_tag, hp)
 train_time = time.process_time() - start_time
 
 pairs = []

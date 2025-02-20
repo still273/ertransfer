@@ -35,18 +35,17 @@ srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datas
 ## Last error
 
 ```bash
-Traceback (most recent call last):
-  File "/srv/entrypoint.py", line 56, in <module>
-    trainset, testset, train_ids, test_ids = transform_input_old(args.input, temp_output, args.recall, seed=args.seed)
-  File "/srv/transform.py", line 121, in transform_input_old
-    pairs = generate_candidates(tableA_df, tableB_df, matches_df, seed)
-  File "/srv/transform.py", line 21, in generate_candidates
-    (cand_tableB.iloc[matches_df['tableB_id']]).reset_index(drop=True)
-  File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 931, in __getitem__
-    return self._getitem_axis(maybe_callable, axis=axis)
-  File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 1557, in _getitem_axis
-    return self._get_list_axis(key, axis=axis)
-  File "/opt/conda/lib/python3.7/site-packages/pandas/core/indexing.py", line 1533, in _get_list_axis
-    raise IndexError("positional indexers are out-of-bounds") from err
-IndexError: positional indexers are out-of-bounds
+
+```
+## User Warning
+
+```bash
+/opt/conda/lib/python3.7/site-packages/spacy/pipeline/lemmatizer.py:187: UserWarning: [W108] The rule-based lemmatizer did not find POS annotation for the token 'CARBON'. Check that your pipeline includes components that assign token.pos, typically 'tagger'+'attribute_ruler' or 'morphologizer'.
+
+/opt/conda/lib/python3.7/site-packages/torch/cuda/__init__.py:143: UserWarning: 
+NVIDIA H100 NVL with CUDA capability sm_90 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_37 sm_50 sm_60 sm_61 sm_70 sm_75 sm_80 sm_86 compute_37.
+If you want to use the NVIDIA H100 NVL GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+
+  warnings.warn(incompatible_device_warn.format(device_name, capability, " ".join(arch_list), device_name))
 ```

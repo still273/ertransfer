@@ -96,8 +96,8 @@ def transform_input(source_dir, output_dir, columns_to_join=None, separator=' ',
     train, train_id = join_columns(train_df, columns_to_join, separator, prefixes)
     test, test_id = join_columns(test_df, columns_to_join, separator, prefixes)
     
-    train_file = os.path.join(output_dir, 'train.tsv')
-    test_file = os.path.join(output_dir, 'test.tsv')
+    train_file = os.path.join(output_dir, 'train.txt')
+    test_file = os.path.join(output_dir, 'test.txt')
     train.to_csv(train_file, '\t', header=False, index=False)
     test.to_csv(test_file, '\t', header=False, index=False)
     return train_file, test_file, train_id, test_id
@@ -123,8 +123,8 @@ def transform_input_old(source_dir, output_dir, recall, seed):
     train, train_id = join_columns(train_df)
     test, test_id = join_columns(test_df)
     
-    train_file = os.path.join(output_dir, 'train.tsv')
-    test_file = os.path.join(output_dir, 'test.tsv')
+    train_file = os.path.join(output_dir, 'train.txt')
+    test_file = os.path.join(output_dir, 'test.txt')
     train.to_csv(train_file, '\t', header=False, index=False)
     test.to_csv(test_file, '\t', header=False, index=False)
     return train_file, test_file, train_id, test_id
