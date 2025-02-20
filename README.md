@@ -35,10 +35,3 @@ wget https://zenodo.org/record/6466387/files/wiki.en.bin -O embedding/wiki.en.bi
 | [hiermatcher](methods/hiermatcher/README.md)     | ok         | ok                                                   | ok            |
 | [magellan](methods/magellan/README.md)           | ok         | ok, no GPU Utilization                               | ok            |
 | [zeroer](methods/zeroer/README.md)               | ok         | ok, no GPU Utilization , add pathtype as dependency? | ok            |
-
-## Web results
-
-- Scores: f1, precision, recall
-- Run time: total + train_time, eval_time
-- Resources: cpu clock, mem, GPU mem, energy
-- Predictions table: tableA_id,tableB_id,probability

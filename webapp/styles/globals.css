@@ -19,3 +19,24 @@ body {
 .container {
     max-width: 1000px;
 }
+
+.p-progressbar.p-progressbar-failed .p-progressbar-value {
+  background: #f32140
+}
+
+.p-progressbar.p-progressbar-success .p-progressbar-value {
+  background: #12ac3c
+}
+
+.p-selectable-row {
+  cursor: pointer;
+}
+
+.p-panel-no-padding .p-panel-content {
+  padding: 0;
+}
+
+.p-datatable-table a {
+  color: initial;
+  text-decoration: none;
+}
