@@ -66,9 +66,10 @@ model Job {
   notifyEmail String?
   createdAt   DateTime @default(now())
 
-  algorithm Algorithm @relation(fields: [algorithmId], references: [id])
-  dataset   Dataset   @relation(fields: [datasetId], references: [id])
-  result    Result?
+  algorithm  Algorithm     @relation(fields: [algorithmId], references: [id])
+  dataset    Dataset       @relation(fields: [datasetId], references: [id])
+  result     Result?
+  predictions Predictions[]
 }
 
 // the model should share id with Jobs
@@ -76,10 +77,30 @@ model Result {
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String @id
 
+  // scores
   f1        Float?
   precision Float?
   recall    Float?
-  maxMem    Int?
-  elapsed   BigInt
+  trainTime BigInt?
+  evalTime  BigInt?
+
+  // resources
+  cpuUtilized    BigInt?
+  memUtilized    BigInt?
+  gpuAllocated   Int?
+  gpuUtilized    BigInt?
+  gpuMemUtilized Int?
+  energyConsumed BigInt?
+  totalRuntime   BigInt
+
   createdAt DateTime @default(now())
+}
+
+model Predictions {
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String @id
+
+  tableA_id BigInt
+  tableB_id BigInt
+  probability Float?
 }

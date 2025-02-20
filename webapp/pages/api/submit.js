@@ -9,17 +9,20 @@ export default async function handler(req, res) {
     }
 
     if (!req.body.force) {
-      const existingResults = await prisma.result.findMany({
+      const existingResults = await prisma.job.findMany({
         where: {
-          job: {
-            status: 'completed',
-            scenario: req.body.scenario,
-            datasetId: req.body.datasetId,
-            algorithmId: req.body.algorithmId,
-            recall: req.body.recall,
-            epochs: req.body.epochs,
-          }
-        }
+          status: 'completed',
+          scenario: req.body.scenario,
+          datasetId: req.body.datasetId,
+          algorithmId: req.body.algorithmId,
+          recall: req.body.recall,
+          epochs: req.body.epochs,
+        },
+        include: {
+          algorithm: true,
+          dataset: true,
+          result: true,
+        },
       });
 
       if (existingResults.length > 0) {
@@ -27,9 +30,8 @@ export default async function handler(req, res) {
       }
     }
 
-    await prisma.job.create({
+    const newJob = await prisma.job.create({
       data: {
-        status: 'pending',
         scenario: req.body.scenario,
         datasetId: req.body.datasetId,
         algorithmId: req.body.algorithmId,
@@ -39,7 +41,7 @@ export default async function handler(req, res) {
       }
     });
 
-    res.status(201);
+    return res.status(201).json(newJob);
   } else {
     res.status(405)
   }
