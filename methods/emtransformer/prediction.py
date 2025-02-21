@@ -44,4 +44,4 @@ def predict(model, device, test_data_loader, include_token_type_ids=False):
     scores = precision_recall_fscore_support(y_true=labels, y_pred=predicted_class)
     report = classification_report(labels, predicted_class)
 
-    return simple_accuracy, f1, report, scores, pd.DataFrame({'predictions': predicted_class, 'labels': labels})
+    return simple_accuracy, f1, report, scores, pd.DataFrame({'predictions': predicted_class, 'labels': labels}), predictions

@@ -129,16 +129,17 @@ if args.model == 'bert':
     include_token_type_ids = True
 
 start_time = time.process_time()
-simple_accuracy, f1, classification_report, prfs, predictions = predict(model, device, test_data_loader, include_token_type_ids)
+simple_accuracy, f1, classification_report, prfs, predictions, logits = predict(model, device, test_data_loader, include_token_type_ids)
 eval_time = time.process_time() - start_time
 
 keys = ['precision', 'recall', 'fbeta_score', 'support']
 prfs = {f'class_{no}': {key: float(prfs[nok][no]) for nok, key in enumerate(keys)} for no in range(2)}
 
 print(classification_report)
+print(logits)
 
 # Step 3. Convert the output into a common format
-transform_output(predictions, test_df, train_time, eval_time, args.output)
+transform_output(predictions, logits, test_df, train_time, eval_time, args.output)
 
 # Step 4. Delete temporary files
 if os.path.exists(os.path.join(args.output, args.model)):
