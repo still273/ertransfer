@@ -7,13 +7,16 @@ def transform_output(score_dicts, f1s, ps, rs, train_time, eval_time, dest_dir):
     # save predictions in predictions.csv
     l_id = []
     r_id = []
+    probs = []
+    labels = []
     for score_dict in score_dicts:
         for pair in score_dict.keys():
-            if score_dict[pair][0] > 0.5:  # see test_GNEM calculate_f1
-                l_id.append(pair[0])
-                r_id.append(pair[1])
+            l_id.append(pair[0])
+            r_id.append(pair[1])
+            probs.append(score_dict[pair][0]) # see test_GNEM calculate_f1
+            labels.append(score_dict[pair][1])
 
-    predictions = pd.DataFrame(data={'tableA_id': l_id, 'tableB_id': r_id})
+    predictions = pd.DataFrame(data={'tableA_id': l_id, 'tableB_id': r_id, 'prob_class1':probs, 'label':labels})
     predictions = predictions.drop_duplicates()
     predictions.to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
 
