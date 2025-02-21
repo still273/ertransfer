@@ -91,21 +91,12 @@ num_train_steps = len(train_iter) * args.epochs
 opt = AdamW(optimizer_grouped_parameters, eps=1e-8)
 scheduler = get_linear_schedule_with_warmup(opt, num_warmup_steps=0, num_training_steps=num_train_steps)
 
-model_dir = args.output
-log_dir = os.path.join(model_dir, "logs")
-tf_log_dir = os.path.join(model_dir, "tf_logs")
-
-if not os.path.exists(model_dir):
-    os.makedirs(model_dir)
-
+log_dir = os.path.join(args.output, "logs")
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
-if not os.path.exists(tf_log_dir):
-    os.makedirs(tf_log_dir)
-
 logger = set_logger(os.path.join(log_dir, str(time.time()) + ".log"))
-tf_logger = SummaryWriter(tf_log_dir)
+tf_logger = SummaryWriter(log_dir)
 
 start_epoch = 0
 start_f1 = 0.0
@@ -119,13 +110,10 @@ neg = 2.0 / (1.0 + pos_neg_ratio)
 criterion = nn.CrossEntropyLoss(weight=torch.Tensor([neg, pos])).to(embedmodel.device)
 
 start_time = time.process_time()
-f1s, ps, rs, score_dicts, time_m = train(train_iter, model_dir, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
+f1s, ps, rs, score_dicts, time_m = train(train_iter, args.output, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs, test_iter=test_iter,# val_iter=val_iter,
       scheduler=scheduler, log_freq=5, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'])
 eval_time = time.process_time() - time_m
 train_time =  time_m - start_time
 
 transform_output(score_dicts, f1s, ps, rs, train_time, eval_time, args.output)
-
-# Step 4. Delete temporary files
-os.remove(os.path.join(args.output, 'train.csv'))
-os.remove(os.path.join(args.output, 'test.csv'))
+print("Final output: ", os.listdir(args.output))

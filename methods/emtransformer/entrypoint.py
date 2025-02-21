@@ -140,7 +140,4 @@ print(logits)
 
 # Step 3. Convert the output into a common format
 transform_output(predictions, logits, test_df, train_time, eval_time, args.output)
-
-# Step 4. Delete temporary files
-if os.path.exists(os.path.join(args.output, args.model)):
-    shutil.rmtree(os.path.join(args.output, args.model))
+print("Final output: ", os.listdir(args.output))

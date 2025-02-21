@@ -13,14 +13,6 @@ From: pytorch/pytorch:1.9.1-cuda11.1-cudnn8-runtime
     requirements.txt /srv
     fork-ditto /srv
     entrypoint.py /srv
-    augment.py /srv
-    configs.json /srv
-    dataset.py /srv
-    ditto.py /srv
-    exceptions.py /srv
-    knowledge.py /srv
-    matcher.py /srv
-    summarize.py /srv
     transform.py /srv
 
 %post

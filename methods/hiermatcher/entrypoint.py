@@ -60,7 +60,3 @@ eval_time = time.process_time() - start_time
 # Step 3. Convert the output into a common format
 transform_output(predictions, test_data, stats, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))
-
-# Step 4. Delete temporary files
-os.remove(os.path.join(args.output, 'train.csv'))
-os.remove(os.path.join(args.output, 'test.csv'))

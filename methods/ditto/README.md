@@ -26,10 +26,10 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ```bash
 mkdir -p ../../apptainer ../../output/ditto
 apptainer build ../../apptainer/ditto.sif container.def
-srun --gpus=1 apptainer run ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/ ../../output/ditto/
+srun -p ampere --gpus=1 apptainer run ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/ ../../output/ditto/
 
 # dev mode with bind
-srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/ ../../output/ditto/
+srun -p ampere --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/ ../../output/ditto/
 ```
 
 ## Last error

@@ -26,11 +26,11 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ```bash
 mkdir -p ../../apptainer ../../output/deepmatcher
 apptainer build ../../apptainer/deepmatcher.sif container.def
-srun --gpus=1 apptainer run ../../apptainer/deepmatcher.sif ../../datasets/d2_abt_buy/ ../../output/deepmatcher/ ../../embedding/
+srun -p ampere --gpus=1 apptainer run ../../apptainer/deepmatcher.sif ../../datasets/d2_abt_buy/ ../../output/deepmatcher/ ../../embedding/
 
 # to verify efficiency
 seff $jobid
 
 # dev mode with bind
-srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/deepmatcher.sif ../../datasets/d2_abt_buy/ ../../output/deepmatcher/ ../../embedding/
+srun -p ampere --gpus=1 apptainer run --bind ./:/srv ../../apptainer/deepmatcher.sif ../../datasets/d2_abt_buy/ ../../output/deepmatcher/ ../../embedding/
 ```

@@ -24,11 +24,11 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ```bash
 mkdir -p ../../apptainer ../../output/gnem
 apptainer build ../../apptainer/gnem.sif container.def
-srun --gpus=1 apptainer run ../../apptainer/gnem.sif ../../datasets/d2_abt_buy/ ../../output/gnem/
+srun -p ampere --gpus=1 apptainer run ../../apptainer/gnem.sif ../../datasets/d2_abt_buy/ ../../output/gnem/
 
 # to verify efficiency
 seff $jobid
 
 # dev mode with bind
-srun --gpus=1 apptainer run --bind ./:/srv ../../apptainer/gnem.sif ../../datasets/d2_abt_buy/ ../../output/gnem/
+srun -p ampere --gpus=1 apptainer run --bind ./:/srv ../../apptainer/gnem.sif ../../datasets/d2_abt_buy/ ../../output/gnem/
 ```

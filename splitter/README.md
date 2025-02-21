@@ -40,5 +40,5 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ```bash
 mkdir -p ../apptainer ../output
 apptainer build ../apptainer/splitter.sif container.def
-srun --gpus=1 apptainer run ../apptainer/splitter.sif ../datasets/d2_abt_buy/ ../output/ ../embedding/
+srun -p ampere --gpus=1 apptainer run ../apptainer/splitter.sif ../datasets/d2_abt_buy/ ../output/ ../embedding/
 ```

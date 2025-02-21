@@ -38,8 +38,8 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ```bash
 mkdir -p ../../apptainer ../../output/magellan
 apptainer build ../../apptainer/magellan.sif container.def
-srun apptainer run ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
+srun -p ampere apptainer run ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
 
 # dev mode with bind
-srun apptainer run --bind ./:/srv ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
+srun -p ampere apptainer run --bind ./:/srv ../../apptainer/magellan.sif ../../datasets/d2_abt_buy/ ../../output/magellan/
 ```

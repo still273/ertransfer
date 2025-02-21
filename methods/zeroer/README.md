@@ -36,8 +36,8 @@ docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/outpu
 ```bash
 mkdir -p ../../apptainer ../../output/zeroer
 apptainer build ../../apptainer/zeroer.sif container.def
-srun apptainer run ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
+srun -p ampere apptainer run ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
 
 # dev mode with bind
-srun apptainer run --bind ./:/srv ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
+srun -p ampere apptainer run --bind ./:/srv ../../apptainer/zeroer.sif ../../datasets/d2_abt_buy/ ../../output/zeroer/
 ```

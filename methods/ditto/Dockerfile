@@ -5,13 +5,12 @@ RUN apt-get update --allow-insecure-repositories && \
     apt-get install -y build-essential && \
     rm -rf /var/lib/apt/lists/*
 
-RUN conda install -c conda-forge nvidia-apex=0.1
-
 WORKDIR /workspace
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN python -m spacy download en_core_web_lg
 RUN python -m nltk.downloader stopwords
+RUN mv /root/nltk_data /opt/conda/lib/nltk_data
 
 COPY fork-ditto .
 COPY *.py .
