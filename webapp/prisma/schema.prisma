@@ -66,9 +66,9 @@ model Job {
   notifyEmail String?
   createdAt   DateTime @default(now())
 
-  algorithm  Algorithm     @relation(fields: [algorithmId], references: [id])
-  dataset    Dataset       @relation(fields: [datasetId], references: [id])
-  result     Result?
+  algorithm   Algorithm     @relation(fields: [algorithmId], references: [id])
+  dataset     Dataset       @relation(fields: [datasetId], references: [id])
+  result      Result?
   predictions Predictions[]
 }
 
@@ -98,9 +98,11 @@ model Result {
 
 model Predictions {
   job   Job    @relation(fields: [jobId], references: [id])
-  jobId String @id
+  jobId String
 
-  tableA_id BigInt
-  tableB_id BigInt
+  tableA_id   BigInt
+  tableB_id   BigInt
   probability Float?
+
+  @@id([jobId, tableA_id, tableB_id])
 }
