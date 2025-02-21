@@ -13,6 +13,11 @@ const hideEmail = email => {
   return `${localPart.substring(0, 3)}***@${domain}`;
 };
 
+BigInt.prototype.toJSON = function () {
+  const int = Number.parseInt(this.toString());
+  return int ?? this.toString();
+};
+
 export const getServerSideProps = async ({query}) => {
   const {id} = query;
 

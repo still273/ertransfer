@@ -89,7 +89,7 @@ model Result {
   memUtilized    BigInt?
   gpuAllocated   Int?
   gpuUtilized    BigInt?
-  gpuMemUtilized Int?
+  gpuMemUtilized BigInt?
   energyConsumed BigInt?
   totalRuntime   BigInt
 
