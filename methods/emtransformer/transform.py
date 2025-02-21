@@ -36,7 +36,7 @@ def transform_input(source_dir, columns_to_join=None, separator=' ', prefixes=['
     return train, test
 
 
-def transform_output(predictions_df,logits, test_table, train_time, eval_time, dest_dir):
+def transform_output(predictions_df, logits, test_table, train_time, eval_time, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
     metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
@@ -44,10 +44,11 @@ def transform_output(predictions_df,logits, test_table, train_time, eval_time, d
     """
     sm = torch.nn.Softmax(dim=1)
     probs = sm(torch.Tensor(logits))
+    predictions_df.rename(columns={'labels': 'label'}, inplace=True)
     predictions_df['prob_class1'] = probs[:, 1].tolist()
     predictions_df['tableA_id'] = test_table.loc[predictions_df.index, 'tableA_id']
     predictions_df['tableB_id'] = test_table.loc[predictions_df.index, 'tableB_id']
-    predictions_df[['tableA_id', 'tableB_id', 'labels', 'prob_class1']].to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
+    predictions_df[['tableA_id', 'tableB_id', 'label', 'prob_class1']].to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
     # get the actual candidates (entity pairs with prediction 1)
     #candidate_ids = predictions_df[predictions_df['predictions'] == 1]
     #candidate_table = test_table.iloc[candidate_ids.index]
@@ -57,8 +58,8 @@ def transform_output(predictions_df,logits, test_table, train_time, eval_time, d
     if predictions_df['predictions'].sum() > 0:
         # calculate evaluation metrics
         num_candidates = predictions_df['predictions'].sum()
-        true_positives = predictions_df.loc[predictions_df['predictions'] == 1, 'labels'].sum()
-        ground_truth = predictions_df['labels'].sum()
+        true_positives = predictions_df.loc[predictions_df['predictions'] == 1, 'label'].sum()
+        ground_truth = predictions_df['label'].sum()
         recall = true_positives / ground_truth
         precision = true_positives / num_candidates
         f1 = 2 * precision * recall / (precision + recall)

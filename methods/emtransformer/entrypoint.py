@@ -28,7 +28,7 @@ parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(
 parser.add_argument('-m', '--model', default='bert', type=str)  # roberta
 parser.add_argument('--max_seq_length', default=128, type=int)  # 180
 parser.add_argument('--train_batch_size', default=8, type=int)  # 16
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,  # 15.0
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,  # 15.0
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()

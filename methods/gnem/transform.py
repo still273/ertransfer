@@ -16,7 +16,7 @@ def transform_output(score_dicts, f1s, ps, rs, train_time, eval_time, dest_dir):
             probs.append(score_dict[pair][0]) # see test_GNEM calculate_f1
             labels.append(score_dict[pair][1])
 
-    predictions = pd.DataFrame(data={'tableA_id': l_id, 'tableB_id': r_id, 'prob_class1':probs, 'label':labels})
+    predictions = pd.DataFrame(data={'tableA_id': l_id, 'tableB_id': r_id, 'label':labels, 'prob_class1':probs})
     predictions = predictions.drop_duplicates()
     predictions.to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
 

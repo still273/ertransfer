@@ -55,13 +55,13 @@ def transform_output(scores, ids, labels, train_time, eval_time, dest_dir):
     """
 
     # get the actual candidates (entity pairs with prediction 1)
-    predictions_df = pd.DataFrame({'tableA_id':ids['tableA_id'], 'tableB_id':ids['tableB_id'], 'probs_class1':scores[:,1], 'label':labels})
+    predictions_df = pd.DataFrame({'tableA_id':ids['tableA_id'], 'tableB_id':ids['tableB_id'], 'label':labels, 'prob_class1':scores[:,1]})
 
     # save candidate pair IDs to predictions.csv
     predictions_df.to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
 
     # calculate evaluation metrics
-    predictions_df['predictions'] = (predictions_df['probs_class1'] > 0.5).astype(int)
+    predictions_df['predictions'] = (predictions_df['prob_class1'] > 0.5).astype(int)
     if predictions_df['predictions'].sum() > 0:
         num_candidates = predictions_df['predictions'].sum()
         true_positives = predictions_df.loc[predictions_df['predictions'] == 1, 'label'].sum()
