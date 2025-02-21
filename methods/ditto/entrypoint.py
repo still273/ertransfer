@@ -37,7 +37,7 @@ parser.add_argument('--run_id', type=int, default=0)
 
 parser.add_argument('-m', '--model', type=str, default='distilbert',
                     help='The model to use')
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()
@@ -147,7 +147,7 @@ train_dataset = DittoDataset(trainset,
                                size=hp.size,
                                da=hp.da)
 #valid_dataset = DittoDataset(validset, lm=args.model)
-test_dataset = DittoDataset(testset, lm=args.model)
+#test_dataset = DittoDataset(testset, lm=args.model)
 
 # train and evaluate the model
 start_time = time.process_time()
@@ -161,11 +161,11 @@ threshold = 0.5
 # batch processing
 out_data = []
 start_time = time.process_time()
-predictions, logits = classify(test_dataset, matcher, lm=hp.lm,
+predictions, logits, labels = classify(testset, matcher, lm=hp.lm,
                                batch_size = hp.batch_size,
                                max_len=hp.max_len,
                                threshold=threshold)
 scores = softmax(logits, axis=1)
 eval_time = time.process_time() - start_time
 
-transform_output(predictions, test_ids, test_dataset.labels, train_time, eval_time, args.output)
+transform_output(scores, test_ids, labels, train_time, eval_time, args.output)
