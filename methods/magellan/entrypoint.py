@@ -119,7 +119,7 @@ start_time = time.process_time()
 prediction = matcher.predict(table=test_f_vectors, exclude_attrs=excl_attributes, append=True, return_probs=True,
                              inplace=False, target_attr='prediction', probs_attr='probability')
 eval_time = time.process_time() - start_time
-
+print(prediction[['prediction', 'probability']])
 # Step 3. Convert the output into a common format
 transform_output(prediction, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))

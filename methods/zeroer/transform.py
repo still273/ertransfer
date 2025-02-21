@@ -47,14 +47,12 @@ def transform_output(predictions, train_time, eval_time, dest_dir):
     predictions.csv: tableA_id, tableB_id, etc. (should have at least 2 columns and a header row)
     """
 
+    predictions['prob_class1'] = np.clip(predictions['pred']+utils.DEL, 0., 1.)
     predictions['prediction'] = np.round(np.clip(predictions['pred'] + utils.DEL, 0., 1.)).astype(int)
-    
-    
+    p_table = predictions[['ltable_id', 'rtable_id', 'prob_class1', 'gold']]
+    p_table.columns = p_table.columns = ['tableA_id', 'tableB_id', 'prob_class1', 'label']
     candidate_table = predictions[predictions['prediction'] == 1]
-    print(candidate_table)
     # save candidate pair IDs to predictions.csv
-    p_table = candidate_table[['ltable_id', 'rtable_id']]
-    p_table.columns = ['tableA_id', 'tableB_id']
     p_table.to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
 
     # calculate evaluation metrics
