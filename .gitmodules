@@ -1,8 +1,8 @@
 [submodule "methods/deepmatcher/fork-deepmatcher"]
 	path = methods/deepmatcher/fork-deepmatcher
 	url = git@github.com:erbench/fork-deepmatcher.git
-[submodule "splitter/fork-deepblocker"]
-	path = splitter/fork-deepblocker
+[submodule "splitters/DeepBlocker/fork-deepblocker"]
+	path = splitters/DeepBlocker/fork-deepblocker
 	url = git@github.com:erbench/fork-deepblocker.git
 [submodule "methods/hiermatcher/fork-deepmatcher"]
 	path = methods/hiermatcher/fork-deepmatcher
