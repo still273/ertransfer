@@ -26,11 +26,24 @@ def clean_entry(entry, stemmer, stop_words):
     return ' '.join(clean_entries)
 
 def generate_candidates(embedding_path, tableA_df, tableB_df, matches_df, settings):
+    for col in tableA_df.columns:
+        if col == 'id':
+            continue
+        tableA_df[col] = tableA_df[col].astype(str)
+        tableA_df[col] = tableA_df[col].str.replace('\t', ' ')
+    for col in tableB_df.columns:
+        if col == 'id':
+            continue
+        tableB_df[col] = tableB_df[col].astype(str)
+        tableB_df[col] = tableB_df[col].str.replace('\t', ' ')
     cols_to_block = list(set(tableA_df.columns.tolist()) & set(tableB_df.columns.tolist()))
     cols_to_block.remove('id')
     print("Blocking columns: ", cols_to_block)
-    tableA_df[cols_to_block] = tableA_df[cols_to_block].astype(str)
-    tableB_df[cols_to_block] = tableB_df[cols_to_block].astype(str)
+    # tableA_df[cols_to_block] = tableA_df[cols_to_block].astype(str)
+    # tableB_df[cols_to_block] = tableB_df[cols_to_block].astype(str)
+    # for col in cols_to_block:
+    #     tableA_df[col] = tableA_df[col].str.replace('\t', ' ')
+    #     tableB_df[col] = tableB_df[col].str.replace('\t', ' ')
     block_A = tableA_df.copy()
     block_B = tableB_df.copy()
 

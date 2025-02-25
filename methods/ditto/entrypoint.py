@@ -41,6 +41,7 @@ temp_output = os.path.join(args.output, 'temp')
 os.makedirs(temp_output, exist_ok=True)
 
 print("Hi, I'm DITTO entrypoint!")
+print("Input taken from: ", args.input)
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
