@@ -8,7 +8,7 @@
 #SBATCH -p ampere
 ##SBATCH --qos=standby
 
-apptainer run ../../apptainer/ditto.sif "$@"
+apptainer run --bind ./:/srv ../../apptainer/ditto.sif "$@"
 
 wait  # Wait for all jobs to complete
 exit 0 # happy end
