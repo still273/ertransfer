@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 
 
-def transform_output(predictions, data, stats, train_time, eval_time, dest_dir):
+def transform_output(predictions, data, stats, results_per_epoch, train_time, eval_time, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
     metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
@@ -31,5 +31,9 @@ def transform_output(predictions, data, stats, train_time, eval_time, dest_dir):
         'train_time': [train_time],
         'eval_time': [eval_time],
     }).to_csv(os.path.join(dest_dir, 'metrics.csv'), index=False)
+
+    pd.DataFrame(results_per_epoch,
+                 columns=['epoch', 'f1', 'precision', 'recall', 'train_time', 'valid_time', 'test_time']
+                 ).to_csv(os.path.join(dest_dir, 'metrics_per_epoch.csv'), index=False)
 
     return None
