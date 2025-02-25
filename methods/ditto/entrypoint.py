@@ -27,34 +27,28 @@ from scipy.special import softmax
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
 parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                     help='Input directory containing the dataset')
-parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', default='/data/output',
+parser.add_argument('output', type=str, nargs='?', default='/data/output',
                     help='Output directory to store the output')
-parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.8,
-                    help='Recall value used to select ground truth pairs')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
-parser.add_argument('--run_id', type=int, default=0)
-
-parser.add_argument('-m', '--model', type=str, default='distilbert',
-                    help='The model to use')
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=2,
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=10,
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()
 
+os.makedirs(args.output, exist_ok=True)
+temp_output = os.path.join(args.output, 'temp')
+os.makedirs(temp_output, exist_ok=True)
+
 print("Hi, I'm DITTO entrypoint!")
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
-
-temp_output = os.path.join(args.output, 'temp')
-os.makedirs(temp_output, exist_ok=True)
 
 # Step 1. Convert input data into the format expected by the method
 print("Method input: ", os.listdir(args.input))
 prefix_1 = 'tableA_'
 prefix_2 = 'tableB_'
 trainset, validset, testset, train_ids, valid_ids, test_ids = transform_input(args.input, temp_output, prefixes=[prefix_1, prefix_2])
-print(test_ids.shape)
 
 hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'n_epochs', #number of epochs
@@ -71,7 +65,7 @@ hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'size',#dataset size
                                                  'run_id'])
 
-hp = hyperparameters(lm = args.model,
+hp = hyperparameters(lm = 'roberta',
                      n_epochs = args.epochs,
                      batch_size = 64,
                      max_len = 256,
@@ -84,14 +78,12 @@ hp = hyperparameters(lm = args.model,
                      dk = 'general',
                      summarize = True,
                      size = None,
-                     run_id = args.run_id)
+                     run_id = 0)
 
 
 
 
 #parser.add_argument("--finetuning", dest="finetuning", action="store_true")
-
-
 
 # set seeds
 seed = args.seed
@@ -105,7 +97,7 @@ if torch.cuda.is_available():
 task = args.input
 
 # create the tag of the run
-run_tag = '%s_lm=%s_da=%s_dk=%s_su=%s_size=%s_id=%d' % (task, args.model, hp.da,
+run_tag = '%s_lm=%s_da=%s_dk=%s_su=%s_size=%s_id=%d' % (task, hp.lm, hp.da,
         hp.dk, hp.summarize, str(hp.size), hp.run_id)
 run_tag = run_tag.replace('/', '_')
 
@@ -126,7 +118,7 @@ config = {"task_type": "classification",
 
 # summarize the sequences up to the max sequence length
 if hp.summarize:
-    summarizer = Summarizer(config, lm=args.model)
+    summarizer = Summarizer(config, lm=hp.lm)
     trainset = summarizer.transform_file(trainset, max_len=hp.max_len)
     validset = summarizer.transform_file(validset, max_len=hp.max_len)
     testset = summarizer.transform_file(testset, max_len=hp.max_len)
@@ -143,12 +135,12 @@ if hp.dk is not None:
 
 # load train/dev/test sets
 train_dataset = DittoDataset(trainset,
-                               lm=args.model,
+                               lm=hp.lm,
                                max_len=hp.max_len,
                                size=hp.size,
                                da=hp.da)
-valid_dataset = DittoDataset(validset, lm=args.model)
-test_dataset = DittoDataset(testset, lm=args.model)
+valid_dataset = DittoDataset(validset, lm=hp.lm)
+test_dataset = DittoDataset(testset, lm=hp.lm)
 
 # train and evaluate the model
 start_time = time.process_time()

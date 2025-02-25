@@ -9,6 +9,7 @@ __pycache__
 node_modules
 test
 embedding
+db_split
 
 /apptainer
 /input
