@@ -37,7 +37,7 @@ parser.add_argument('--run_id', type=int, default=0)
 
 parser.add_argument('-m', '--model', type=str, default='distilbert',
                     help='The model to use')
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=2,
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()
@@ -53,7 +53,8 @@ os.makedirs(temp_output, exist_ok=True)
 print("Method input: ", os.listdir(args.input))
 prefix_1 = 'tableA_'
 prefix_2 = 'tableB_'
-trainset, testset, train_ids, test_ids = transform_input(args.input, temp_output, prefixes=[prefix_1, prefix_2])
+trainset, validset, testset, train_ids, valid_ids, test_ids = transform_input(args.input, temp_output, prefixes=[prefix_1, prefix_2])
+print(test_ids.shape)
 
 hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'n_epochs', #number of epochs
@@ -120,14 +121,14 @@ run_tag = run_tag.replace('/', '_')
 config = {"task_type": "classification",
   "vocab": ["0", "1"],
   "trainset": os.path.join(temp_output, 'train.txt'),
-  #"validset":os.path.join(temp_output, 'train.txt'),
+  "validset":os.path.join(temp_output, 'valid.txt'),
   "testset": os.path.join(temp_output, 'test.txt')}
 
 # summarize the sequences up to the max sequence length
 if hp.summarize:
     summarizer = Summarizer(config, lm=args.model)
     trainset = summarizer.transform_file(trainset, max_len=hp.max_len)
-    #validset = summarizer.transform_file(validset, max_len=args.max_len)
+    validset = summarizer.transform_file(validset, max_len=hp.max_len)
     testset = summarizer.transform_file(testset, max_len=hp.max_len)
 
 if hp.dk is not None:
@@ -137,7 +138,7 @@ if hp.dk is not None:
         injector = GeneralDKInjector(config, hp.dk)
 
     trainset = injector.transform_file(trainset)
-    #validset = injector.transform_file(validset)
+    validset = injector.transform_file(validset)
     testset = injector.transform_file(testset)
 
 # load train/dev/test sets
@@ -146,17 +147,16 @@ train_dataset = DittoDataset(trainset,
                                max_len=hp.max_len,
                                size=hp.size,
                                da=hp.da)
-#valid_dataset = DittoDataset(validset, lm=args.model)
-#test_dataset = DittoDataset(testset, lm=args.model)
+valid_dataset = DittoDataset(validset, lm=args.model)
+test_dataset = DittoDataset(testset, lm=args.model)
 
 # train and evaluate the model
 start_time = time.process_time()
-print('start training')
-matcher = train(train_dataset,None, None, run_tag, hp)
+matcher, threshold, results_per_epoch = train(train_dataset,valid_dataset, test_dataset, run_tag, hp)
 train_time = time.process_time() - start_time
 
 pairs = []
-threshold = 0.5
+#threshold = 0.5
 
 # batch processing
 out_data = []
@@ -168,4 +168,9 @@ predictions, logits, labels = classify(testset, matcher, lm=hp.lm,
 scores = softmax(logits, axis=1)
 eval_time = time.process_time() - start_time
 
-transform_output(scores, test_ids, labels, train_time, eval_time, args.output)
+transform_output(scores, threshold, results_per_epoch, test_ids, labels, train_time, eval_time, args.output)
+
+# Step 4. Delete temporary files
+for file in os.listdir(temp_output):
+    if os.path.isfile(os.path.join(temp_output, file)):
+        os.remove(os.path.join(temp_output, file))
