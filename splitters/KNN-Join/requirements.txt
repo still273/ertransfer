@@ -1,0 +1,6 @@
+sentencepiece
+pyjedai
+pathtype
+pandas
+numpy
+scikit-learn

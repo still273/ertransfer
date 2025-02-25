@@ -1,0 +1,25 @@
+Bootstrap: docker
+From: python:3.9
+
+%labels
+    Author Oleh Astappiev, Franziska Neuhof
+    Version v0.0.1
+
+%help
+    Splits the dataset into training, validation, and testing sets.
+    See `-h` for more information.
+
+%files
+    requirements.txt /srv
+    splitter.py /srv
+    settings.py /srv
+
+%post
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+    python -m nltk.downloader stopwords
+    python -m nltk.downloader punkt_tab
+    mv /root/nltk_data /opt/conda/lib/nltk_data
+
+%runscript
+    exec python -u /srv/splitter.py  "$@"
