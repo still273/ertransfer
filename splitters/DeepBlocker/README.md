@@ -1,6 +1,7 @@
-# Simple Dataset Splitter (a.k.a. random splitter)
+# DeepBlocker dataset splitter
 
 Splits the dataset into training, validation, and testing sets.
+Based on [DeepBlocker](https://github.com/gpapadis/DLMatchers/tree/main/DeepBlocker4NewDatasets).
 
 ## Expected directory structure
 
@@ -17,10 +18,12 @@ The produced output will include two files, and the split by recall value provid
 
 ## How to use
 
+IMPORTANT! `/workspace/embedding` should be mounted with `wiki.en.bin` embeddings inside.
+
 You can directly execute the docker image as following:
 
 ```bash
-docker run --rm -v ../../datasets/d2_abt_buy:/data -v ../embedding:/workspace/embedding splitter-simple
+docker run --rm -v .:/data splitter
 ```
 
 This will assume that you have the input dataset in the current directory,
@@ -29,13 +32,16 @@ it will mount it as `/data` and will output the results in the same folder.
 You can override the input and output directories by providing them as arguments to the docker image:
 
 ```bash
-docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/output splitter-simple /data/input /data/output
+docker run -v ../../datasets/d2_abt_buy:/data/input:ro -v ../../test:/data/output splitter /data/input /data/output
 ```
 
 ## Apptainer
 
 ```bash
-mkdir -p ../apptainer ../output
-apptainer build ../apptainer/splitter_simple.sif container.def
-apptainer run ../apptainer/splitter_simple.sif ../datasets/d2_abt_buy/ ../output/
+mkdir -p ../../apptainer ../../output
+apptainer build ../../apptainer/deepblocker.sif container.def
+srun --gpus=1 -p ampere apptainer run ../../apptainer/deepblocker.sif ../../datasets/d2_abt_buy/ db_split ../../embedding/
+
+# dev mode with bind
+srun --gpus=1 -p ampere apptainer run --bind ./:/srv ../../apptainer/deepblocker.sif ../../datasets/d2_abt_buy/ db_split ../../embedding/
 ```

@@ -12,6 +12,7 @@ From: pytorch/pytorch:1.13.1-cuda11.6-cudnn8-runtime
 %files
     requirements.txt /srv
     splitter.py /srv
+    settings.py /srv
     fork-deepblocker /srv
 
 %post
