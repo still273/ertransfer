@@ -12,7 +12,9 @@ def transform_output(predictions_df, train_time, eval_time, dest_dir):
     # get the actual candidates (entity pairs with prediction 1)
     candidate_table = predictions_df[predictions_df['prediction'] == 1]
     # save candidate pair IDs to predictions.csv
-    predictions_df[['tableA_id', 'tableB_id', 'probability', 'prediction']].to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
+    predictions_df = predictions_df[['tableA_id', 'tableB_id', 'label', 'probability']]
+    predictions_df.columns = ['tableA_id', 'tableB_id', 'label', 'prob_class1']
+    predictions_df.to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
     #candidate_table[['tableA_id', 'tableB_id']].to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
 
     # calculate evaluation metrics

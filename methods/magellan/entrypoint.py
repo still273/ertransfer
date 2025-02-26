@@ -13,17 +13,19 @@ from sklearn.preprocessing import StandardScaler
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
 parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', default='/data',
                     help='Input directory containing the dataset')
-parser.add_argument('output', type=pathtype.Path(writable=True), nargs='?', default='/data/output',
+parser.add_argument('output', type=str, nargs='?', default='/data/output',
                     help='Output directory to store the output')
-parser.add_argument('-m', '--method', type=str, default="DecisionTree",
+parser.add_argument('-m', '--method', type=str, default="RF",
                     choices=["DecisionTree", "SVM", "RF", "LogReg", "LinReg", "NaiveBayes"],
                     help='Method to use for the algorithm')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
 
 args = parser.parse_args()
+os.makedirs(args.output, exist_ok=True)
 
 print("Hi, I'm Magellan entrypoint!")
+print("Input taken from: ", args.input)
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
@@ -42,6 +44,11 @@ tableA = pd.read_csv(os.path.join(args.input, 'tableA.csv'), encoding_errors='re
 tableB = pd.read_csv(os.path.join(args.input, 'tableB.csv'), encoding_errors='replace')
 train = pd.read_csv(os.path.join(args.input, 'train.csv'), encoding_errors='replace')
 test = pd.read_csv(os.path.join(args.input, 'test.csv'), encoding_errors='replace')
+
+tableA.rename(columns=lambda x: x.split('/')[-1], inplace=True)
+tableB.rename(columns=lambda x: x.split('/')[-1], inplace=True)
+train.rename(columns=lambda x: x.split('/')[-1], inplace=True)
+test.rename(columns=lambda x: x.split('/')[-1], inplace=True)
 
 train['id'] = np.arange(train.shape[0])
 test['id'] = np.arange(test.shape[0])
@@ -119,7 +126,6 @@ start_time = time.process_time()
 prediction = matcher.predict(table=test_f_vectors, exclude_attrs=excl_attributes, append=True, return_probs=True,
                              inplace=False, target_attr='prediction', probs_attr='probability')
 eval_time = time.process_time() - start_time
-print(prediction[['prediction', 'probability']])
 # Step 3. Convert the output into a common format
 transform_output(prediction, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))

@@ -27,6 +27,7 @@ args = parser.parse_args()
 os.makedirs(args.output, exist_ok=True)
 
 print("Hi, I'm HierMatcher entrypoint!")
+print("Input taken from: ", args.input)
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
