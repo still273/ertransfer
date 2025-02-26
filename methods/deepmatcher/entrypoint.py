@@ -8,7 +8,7 @@ import pathtype
 
 import pandas as pd
 import deepmatcher as dm
-from transform import transform_output
+from transform import transform_input, transform_output
 import torch
 
 parser = argparse.ArgumentParser(description='Benchmark a dataset with a method')
@@ -29,13 +29,7 @@ print("Input taken from: ", args.input)
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
-train_data = pd.read_csv(os.path.join(args.input, 'train.csv'), encoding_errors='replace')
-test_data = pd.read_csv(os.path.join(args.input, 'test.csv'), encoding_errors='replace')
-valid_data = pd.read_csv(os.path.join(args.input, 'valid.csv'), encoding_errors='replace')
-
-train_data.drop(columns=['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'train.csv'), index_label='id')
-test_data.drop(columns=['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'test.csv'), index_label='id')
-valid_data.drop(columns = ['tableA_id', 'tableB_id']).to_csv(os.path.join(args.output, 'valid.csv'), index_label='id')
+transform_input(args.input, args.output)
 
 # Step 1. Convert input data into the format expected by the method
 datasets = dm.data.process(path=args.output,
