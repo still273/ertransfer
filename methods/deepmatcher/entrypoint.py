@@ -56,7 +56,9 @@ start_time = time.process_time()
 predictions, stats = model.run_eval(test, return_stats=True, return_predictions=True)
 eval_time = time.process_time() - start_time
 
+
 # Step 3. Convert the output into a common format
+test_data =  pd.read_csv(os.path.join(args.input, 'test.csv'), encoding_errors='replace')
 transform_output(predictions,test_data, stats, results_per_epoch, train_time, eval_time, args.output)
 print("Final output: ", os.listdir(args.output))
 
