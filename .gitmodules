@@ -1,18 +1,18 @@
 [submodule "methods/deepmatcher/fork-deepmatcher"]
 	path = methods/deepmatcher/fork-deepmatcher
-	url = git@github.com:erbench/fork-deepmatcher.git
+	url = git@github.com:still273/fork-deepmatcher.git
 [submodule "splitters/DeepBlocker/fork-deepblocker"]
 	path = splitters/DeepBlocker/fork-deepblocker
-	url = git@github.com:erbench/fork-deepblocker.git
+	url = git@github.com:still273/fork-deepblocker.git
 [submodule "methods/hiermatcher/fork-deepmatcher"]
 	path = methods/hiermatcher/fork-deepmatcher
-	url = git@github.com:erbench/fork-deepmatcher.git
+	url = git@github.com:still273/fork-deepmatcher.git
 [submodule "methods/gnem/fork-gnem"]
 	path = methods/gnem/fork-gnem
 	url = git@github.com:erbench/fork-gnem.git
 [submodule "methods/zeroer/fork-zeroer"]
 	path = methods/zeroer/fork-zeroer
-	url = git@github.com:erbench/fork-zeroer.git
+	url = git@github.com:still273/fork-zeroer.git
 [submodule "methods/ditto/fork-ditto"]
 	path = methods/ditto/fork-ditto
-	url = git@github.com:erbench/fork-ditto.git
+	url = git@github.com:still273/fork-ditto.git
