@@ -1,18 +1,18 @@
-[submodule "methods/deepmatcher/fork-deepmatcher"]
-	path = methods/deepmatcher/fork-deepmatcher
-	url = git@github.com:still273/fork-deepmatcher.git
-[submodule "splitters/DeepBlocker/fork-deepblocker"]
-	path = splitters/DeepBlocker/fork-deepblocker
-	url = git@github.com:still273/fork-deepblocker.git
-[submodule "methods/hiermatcher/fork-deepmatcher"]
-	path = methods/hiermatcher/fork-deepmatcher
-	url = git@github.com:still273/fork-deepmatcher.git
-[submodule "methods/gnem/fork-gnem"]
-	path = methods/gnem/fork-gnem
-	url = git@github.com:erbench/fork-gnem.git
-[submodule "methods/zeroer/fork-zeroer"]
-	path = methods/zeroer/fork-zeroer
-	url = git@github.com:still273/fork-zeroer.git
 [submodule "ertransfer_ditto"]
 	path = methods/ditto/fork-ditto
 	url = git@github.com:still273/fork-ditto.git
+[submodule "ertransfer_deepmatcher"]
+	path = methods/deepmatcher/fork-deepmatcher
+	url = git@github.com:still273/fork-deepmatcher.git
+[submodule "ertransfer_hiermatcher"]
+	path = methods/hiermatcher/fork-deepmatcher
+	url = git@github.com:still273/fork-deepmatcher.git
+[submodule "ertransfer_deepblocker"]
+	path = splitters/DeepBlocker/fork-deepblocker
+	url = git@github.com:still273/fork-deepblocker.git
+[submodule "ertransfer_zeroer"]
+	path = methods/zeroer/fork-zeroer
+	url = git@github.com:still273/fork-zeroer.git
+[submodule "ertransfer_gnem"]
+	path = methods/gnem/fork-gnem
+	url = git@github.com:still273/fork-gnem.git
