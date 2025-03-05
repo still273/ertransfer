@@ -29,9 +29,11 @@ parser.add_argument('input', type=pathtype.Path(readable=True), nargs='?', defau
                     help='Input directory containing the dataset')
 parser.add_argument('output', type=str, nargs='?', default='/data/output',
                     help='Output directory to store the output')
+parser.add_argument('--test_data', '-t', type=pathtype.Path(readable=True), nargs='*',
+                  help='Input directories containing additional test data')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
-parser.add_argument('-e', '--epochs', type=int, nargs='?', default=10,
+parser.add_argument('-e', '--epochs', type=int, nargs='?', default=2,
                     help='Number of epochs to train the model')
 
 args = parser.parse_args()
@@ -45,11 +47,16 @@ print("Input taken from: ", args.input)
 print("Input directory: ", os.listdir(args.input))
 print("Output directory: ", os.listdir(args.output))
 
+test_input = [args.input]
+if type(args.test_data) != type(None):
+    print(args.test_data)
+    test_input += args.test_data
+
 # Step 1. Convert input data into the format expected by the method
 print("Method input: ", os.listdir(args.input))
 prefix_1 = 'tableA_'
 prefix_2 = 'tableB_'
-trainset, validset, testset, train_ids, valid_ids, test_ids = transform_input(args.input, temp_output, prefixes=[prefix_1, prefix_2])
+trainset, validset, testsets, train_ids, valid_ids, test_ids = transform_input(args.input, test_input, temp_output, prefixes=[prefix_1, prefix_2])
 
 hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'n_epochs', #number of epochs
@@ -102,27 +109,19 @@ run_tag = '%s_lm=%s_da=%s_dk=%s_su=%s_size=%s_id=%d' % (task, hp.lm, hp.da,
         hp.dk, hp.summarize, str(hp.size), hp.run_id)
 run_tag = run_tag.replace('/', '_')
 
-# # load task configuration
-# configs = json.load(open('configs.json'))
-# configs = {conf['name'] : conf for conf in configs}
-# config = configs[task]
-
-# trainset = config['trainset']
-# #validset = config['validset']
-# testset = config['testset']
-
 config = {"task_type": "classification",
   "vocab": ["0", "1"],
-  "trainset": os.path.join(temp_output, 'train.txt'),
-  "validset":os.path.join(temp_output, 'valid.txt'),
-  "testset": os.path.join(temp_output, 'test.txt')}
+  "trainset": trainset,
+  "validset":validset,
+  "testset": testsets[0]}   #idf only build from first testset, not the others.
 
 # summarize the sequences up to the max sequence length
 if hp.summarize:
     summarizer = Summarizer(config, lm=hp.lm)
     trainset = summarizer.transform_file(trainset, max_len=hp.max_len)
     validset = summarizer.transform_file(validset, max_len=hp.max_len)
-    testset = summarizer.transform_file(testset, max_len=hp.max_len)
+    for i, testset in enumerate(testsets):
+        testsets[i] = summarizer.transform_file(testset, max_len=hp.max_len)
 
 if hp.dk is not None:
     if hp.dk == 'product':
@@ -132,7 +131,8 @@ if hp.dk is not None:
 
     trainset = injector.transform_file(trainset)
     validset = injector.transform_file(validset)
-    testset = injector.transform_file(testset)
+    for i, testset in enumerate(testsets):
+        testsets[i] = injector.transform_file(testset)
 
 # load train/dev/test sets
 train_dataset = DittoDataset(trainset,
@@ -141,11 +141,13 @@ train_dataset = DittoDataset(trainset,
                                size=hp.size,
                                da=hp.da)
 valid_dataset = DittoDataset(validset, lm=hp.lm)
-test_dataset = DittoDataset(testset, lm=hp.lm)
+test_datasets = []
+for testset in testsets:
+    test_datasets.append(DittoDataset(testset, lm=hp.lm))
 
 # train and evaluate the model
 start_time = time.process_time()
-matcher, threshold, results_per_epoch = train(train_dataset,valid_dataset, test_dataset, run_tag, hp)
+matcher, threshold, results_per_epoch = train(train_dataset,valid_dataset, test_datasets, run_tag, hp)
 train_time = time.process_time() - start_time
 
 pairs = []
@@ -154,14 +156,22 @@ pairs = []
 # batch processing
 out_data = []
 start_time = time.process_time()
-predictions, logits, labels = classify(testset, matcher, lm=hp.lm,
+preds = []
+scores = []
+labels = []
+for testset in testsets:
+    predictions, logits, label = classify(testset, matcher, lm=hp.lm,
                                batch_size = hp.batch_size,
                                max_len=hp.max_len,
                                threshold=threshold)
-scores = softmax(logits, axis=1)
+    score = softmax(logits, axis=1)
+    preds.append(predictions)
+    scores.append(score)
+    labels.append(label)
+
 eval_time = time.process_time() - start_time
 
-transform_output(scores, threshold, results_per_epoch, test_ids, labels, train_time, eval_time, args.output)
+transform_output(scores, threshold, results_per_epoch, test_ids, labels, train_time, eval_time, test_input, args.output)
 
 # Step 4. Delete temporary files
 for file in os.listdir(temp_output):
