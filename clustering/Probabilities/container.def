@@ -1,0 +1,21 @@
+Bootstrap: docker
+From: python:3.9
+
+%labels
+    Author Franziska Neuhof
+    Version v0.0.1
+
+%help
+    Cluster data according to predicted probabilities.
+    See `-h` for more information.
+
+%files
+    requirements.txt /srv
+    probabilities.py /srv
+
+%post
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+
+%runscript
+    exec python -u /srv/probabilities.py  "$@"
