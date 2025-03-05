@@ -32,62 +32,75 @@ def join_columns (table, columns_to_join=None, separator=' ', prefixes=['tableA_
         pd.concat([table[prefixes[0] + 'id'], table[prefixes[1] + 'id']], axis=1)
 
 
-def transform_input(source_dir, output_dir, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
+def transform_input(source_dir, add_test_data, output_dir, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
     train_df = pd.read_csv(os.path.join(source_dir, 'train.csv'), encoding_errors='replace')
     valid_df = pd.read_csv(os.path.join(source_dir, 'valid.csv'), encoding_errors='replace')
-    test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
     
     train, train_id = join_columns(train_df, columns_to_join, separator, prefixes)
     valid, valid_id = join_columns(valid_df, columns_to_join, separator, prefixes)
-    test, test_id = join_columns(test_df, columns_to_join, separator, prefixes)
     
     train_file = os.path.join(output_dir, 'train.txt')
     valid_file = os.path.join(output_dir, 'valid.txt')
-    test_file = os.path.join(output_dir, 'test.txt')
+
     train.to_csv(train_file, '\t', header=False, index=False)
     valid.to_csv(valid_file, '\t', header=False, index=False)
-    test.to_csv(test_file, '\t', header=False, index=False)
-    return train_file, valid_file, test_file, train_id, valid_id, test_id
+
+    test_files = []
+    test_ids = []
+    for i, folder in enumerate(add_test_data):
+        test_df = pd.read_csv(os.path.join(folder, 'test.csv'), encoding_errors='replace')
+        test, test_id = join_columns(test_df, columns_to_join, separator, prefixes)
+        test_file = os.path.join(output_dir, f'test{i}.txt')
+        test.to_csv(test_file, '\t', header=False, index=False)
+        test_files.append(test_file)
+        test_ids.append(test_id)
+
+    return train_file, valid_file, test_files, train_id, valid_id, test_ids
 
 
 
-def transform_output(scores, threshold, results_per_epoch, ids, labels, train_time, eval_time, dest_dir):
+def transform_output(scores, threshold, results_per_epoch, ids, labels, train_time, eval_time, test_input, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
     metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
     predictions.csv: tableA_id, tableB_id, etc. (should have at least 2 columns and a header row)
     """
+    epoch_res_cols = ['epoch']
+    for i, test_folder in enumerate(test_input):
+        test_name = str(test_folder).split('/')[-2]
 
-    # get the actual candidates (entity pairs with prediction 1)
-    predictions_df = pd.DataFrame({'tableA_id':ids['tableA_id'], 'tableB_id':ids['tableB_id'], 'label':labels, 'prob_class1':scores[:,1]})
+        # get the actual candidates (entity pairs with prediction 1)
+        predictions_df = pd.DataFrame({'tableA_id':ids[i]['tableA_id'], 'tableB_id':ids[i]['tableB_id'], 'label':labels[i], 'prob_class1':scores[i][:,1]})
 
-    # save candidate pair IDs to predictions.csv
-    predictions_df.to_csv(os.path.join(dest_dir, 'predictions.csv'), index=False)
+        # save candidate pair IDs to predictions.csv
+        predictions_df.to_csv(os.path.join(dest_dir, f'predictions_{test_name}.csv'), index=False)
 
-    # calculate evaluation metrics
-    predictions_df['predictions'] = (predictions_df['prob_class1'] > threshold).astype(int)
-    if predictions_df['predictions'].sum() > 0:
-        num_candidates = predictions_df['predictions'].sum()
-        true_positives = predictions_df.loc[predictions_df['predictions'] == 1, 'label'].sum()
-        ground_truth = predictions_df['label'].sum()
-        recall = true_positives / ground_truth
-        precision = true_positives / num_candidates
-        f1 = 2 * precision * recall / (precision + recall)
-    else:
-        f1 = 0
-        precision = 0
-        recall = 0
+        # calculate evaluation metrics
+        predictions_df['predictions'] = (predictions_df['prob_class1'] > threshold).astype(int)
+        if predictions_df['predictions'].sum() > 0:
+            num_candidates = predictions_df['predictions'].sum()
+            true_positives = predictions_df.loc[predictions_df['predictions'] == 1, 'label'].sum()
+            ground_truth = predictions_df['label'].sum()
+            recall = true_positives / ground_truth
+            precision = true_positives / num_candidates
+            f1 = 2 * precision * recall / (precision + recall)
+        else:
+            f1 = 0
+            precision = 0
+            recall = 0
 
-    pd.DataFrame({
-        'f1': [f1],
-        'precision': [precision],
-        'recall': [recall],
-        'train_time': [train_time],
-        'eval_time': [eval_time],
-    }).to_csv(os.path.join(dest_dir, 'metrics.csv'), index=False)
+        pd.DataFrame({
+            'f1': [f1],
+            'precision': [precision],
+            'recall': [recall],
+            'train_time': [train_time],
+            'eval_time': [eval_time],
+        }).to_csv(os.path.join(dest_dir, f'metrics_{test_name}.csv'), index=False)
 
+        epoch_res_cols += [f'f1_{test_name}', f'precision_{test_name}', f'recall_{test_name}']
+    epoch_res_cols += ['train_time', 'valid_time', 'test_time']
     pd.DataFrame(results_per_epoch,
-                 columns=['epoch', 'f1', 'precision', 'recall', 'train_time', 'valid_time', 'test_time']
+                 columns=epoch_res_cols
                  ).to_csv(os.path.join(dest_dir, 'metrics_per_epoch.csv'), index=False)
     return None
 
