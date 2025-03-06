@@ -4,6 +4,15 @@ import sys
 import pandas as pd
 import numpy as np
 from itertools import product
+from scipy.special import softmax
+import bz2
+import pickle
+
+def save_vectors(values, labels, pair_ids, name='embeddings'):
+    data = [values, labels, pair_ids.to_numpy()]
+
+    with bz2.BZ2File(str(name) + '.pbz2', 'wb') as f:
+        pickle.dump(data, f, 4)
 
 def join_columns (table, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
     agg_table = pd.DataFrame()
@@ -70,7 +79,10 @@ def transform_output(scores, threshold, results_per_epoch, ids, labels, train_ti
         test_name = str(test_folder).split('/')[-2]
 
         # get the actual candidates (entity pairs with prediction 1)
-        predictions_df = pd.DataFrame({'tableA_id':ids[i]['tableA_id'], 'tableB_id':ids[i]['tableB_id'], 'label':labels[i], 'prob_class1':scores[i][:,1]})
+        scores[i] = np.array(scores[i])
+        probs = softmax(scores[i], axis=1)[:,1]
+        predictions_df = pd.DataFrame({'tableA_id':ids[i]['tableA_id'], 'tableB_id':ids[i]['tableB_id'], 'label':labels[i],
+                                       'prob_class1':probs, 'logit0': scores[i][:,0], 'logit1': scores[i][:,1]})
 
         # save candidate pair IDs to predictions.csv
         predictions_df.to_csv(os.path.join(dest_dir, f'predictions_{test_name}.csv'), index=False)

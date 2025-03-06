@@ -11,7 +11,7 @@ import numpy as np
 from collections import namedtuple
 import time
 
-from transform import transform_input, transform_output
+from transform import transform_input, transform_output, save_vectors
 
 sys.path.insert(0, "Snippext_public")
 
@@ -159,15 +159,19 @@ start_time = time.process_time()
 preds = []
 scores = []
 labels = []
-for testset in testsets:
-    predictions, logits, label = classify(testset, matcher, lm=hp.lm,
+for i, testset in enumerate(testsets):
+    predictions, logits, label, embs = classify(testset, matcher, lm=hp.lm,
                                batch_size = hp.batch_size,
                                max_len=hp.max_len,
-                               threshold=threshold)
+                               threshold=threshold, return_embeddings=True)
+
     score = softmax(logits, axis=1)
     preds.append(predictions)
-    scores.append(score)
+    scores.append(logits)
     labels.append(label)
+
+    test_name = str(test_input[i]).split('/')[-2]
+    save_vectors(embs, label, test_ids[i], os.path.join(args.output, f"embeddings_{test_name}"))
 
 eval_time = time.process_time() - start_time
 
