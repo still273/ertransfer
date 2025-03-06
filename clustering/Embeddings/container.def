@@ -11,13 +11,11 @@ From: python:3.9
 
 %files
     requirements.txt /srv
-    sklearn_clusters.py /srv
-    entrypoint.py /srv
-    clustering.py /srv
+    embeddings.py /srv
 
 %post
     cd /srv
     pip install --no-cache-dir -r requirements.txt
 
 %runscript
-    exec python -u /srv/entrypoint.py  "$@"
+    exec python -u /srv/embeddings.py  "$@"
