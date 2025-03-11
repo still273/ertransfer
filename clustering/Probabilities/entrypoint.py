@@ -3,7 +3,7 @@ import pathtype
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
-from clustering import exact_clusters, unique_mapping_clusters
+from clustering import exact_clusters, unique_mapping_clusters, tune_sim_threshold
 from sklearn_clusters import kmeans_probability, kmeans_logits
 
 def plot_histogram(data, save_name):
@@ -60,10 +60,11 @@ if __name__ == "__main__":
 
     data = pd.read_csv(args.input, encoding_errors='replace')
     data = data.astype(float)
-    exact_clusters(data)
-    unique_mapping_clusters(data)
-    kmeans_probability(data, num_clusters=4)
-    kmeans_logits(data, num_clusters=2)
+    tune_sim_threshold(data, unique_mapping_clusters)
+    #exact_clusters(data)
+    #unique_mapping_clusters(data)
+    #kmeans_probability(data, num_clusters=4)
+    #kmeans_logits(data, num_clusters=2)
 
     plot_logits(data, 'test_logits')
     plot_histogram(data, 'test_histogram')
