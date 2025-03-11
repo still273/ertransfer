@@ -41,10 +41,16 @@ def join_columns (table, columns_to_join=None, separator=' ', prefixes=['tableA_
         pd.concat([table[prefixes[0] + 'id'], table[prefixes[1] + 'id']], axis=1)
 
 
-def transform_input(source_dir, add_test_data, output_dir, columns_to_join=None, separator=' ', prefixes=['tableA_', 'tableB_']):
+def transform_input(source_dir, add_test_data, output_dir, columns_to_join=None, separator=' ',
+                    prefixes=['tableA_', 'tableB_'], full_train_input=False, full_add_test=False):
+
     train_df = pd.read_csv(os.path.join(source_dir, 'train.csv'), encoding_errors='replace')
     valid_df = pd.read_csv(os.path.join(source_dir, 'valid.csv'), encoding_errors='replace')
-    
+
+    if full_train_input:
+        test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
+        train_df = pd.concat([train_df, valid_df, test_df], ignore_index=True)
+    print(train_df.shape)
     train, train_id = join_columns(train_df, columns_to_join, separator, prefixes)
     valid, valid_id = join_columns(valid_df, columns_to_join, separator, prefixes)
     
@@ -58,7 +64,13 @@ def transform_input(source_dir, add_test_data, output_dir, columns_to_join=None,
     test_ids = []
     for i, folder in enumerate(add_test_data):
         test_df = pd.read_csv(os.path.join(folder, 'test.csv'), encoding_errors='replace')
+        if full_add_test and not str(folder) == str(source_dir):
+            train_df = pd.read_csv(os.path.join(folder, 'train.csv'), encoding_errors='replace')
+            valid_df = pd.read_csv(os.path.join(folder, 'valid.csv'), encoding_errors='replace')
+            test_df = pd.concat([train_df, valid_df, test_df], ignore_index=True)
+        print(test_df.shape)
         test, test_id = join_columns(test_df, columns_to_join, separator, prefixes)
+        print(test.shape)
         test_file = os.path.join(output_dir, f'test{i}.txt')
         test.to_csv(test_file, '\t', header=False, index=False)
         test_files.append(test_file)
@@ -80,6 +92,7 @@ def transform_output(scores, threshold, results_per_epoch, ids, labels, train_ti
 
         # get the actual candidates (entity pairs with prediction 1)
         scores[i] = np.array(scores[i])
+        print(scores[i].shape, ids[i].shape)
         probs = softmax(scores[i], axis=1)[:,1]
         predictions_df = pd.DataFrame({'tableA_id':ids[i]['tableA_id'], 'tableB_id':ids[i]['tableB_id'], 'label':labels[i],
                                        'prob_class1':probs, 'logit0': scores[i][:,0], 'logit1': scores[i][:,1]})
@@ -110,6 +123,8 @@ def transform_output(scores, threshold, results_per_epoch, ids, labels, train_ti
         }).to_csv(os.path.join(dest_dir, f'metrics_{test_name}.csv'), index=False)
 
         epoch_res_cols += [f'f1_{test_name}', f'precision_{test_name}', f'recall_{test_name}']
+    if len(results_per_epoch[0]) < len(test_input)*3 + 4:
+        epoch_res_cols = epoch_res_cols[:4]
     epoch_res_cols += ['train_time', 'valid_time', 'test_time']
     pd.DataFrame(results_per_epoch,
                  columns=epoch_res_cols

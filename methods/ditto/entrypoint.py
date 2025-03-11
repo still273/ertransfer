@@ -35,6 +35,10 @@ parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(
                     help='The random state used to initialize the algorithms and split dataset')
 parser.add_argument('-e', '--epochs', type=int, nargs='?', default=2,
                     help='Number of epochs to train the model')
+parser.add_argument('-if', '--input_train_full', action='store_true',
+                    help='Use also the test data of the input for training')
+parser.add_argument('-tf', '--test_full', action='store_true',
+                    help='Evaluate the full candidates of the additional test data')
 
 args = parser.parse_args()
 
@@ -56,7 +60,10 @@ if type(args.test_data) != type(None):
 print("Method input: ", os.listdir(args.input))
 prefix_1 = 'tableA_'
 prefix_2 = 'tableB_'
-trainset, validset, testsets, train_ids, valid_ids, test_ids = transform_input(args.input, test_input, temp_output, prefixes=[prefix_1, prefix_2])
+trainset, validset, testsets, train_ids, valid_ids, test_ids = transform_input(args.input, test_input, temp_output,
+                                                                               prefixes=[prefix_1, prefix_2],
+                                                                               full_train_input=args.input_train_full,
+                                                                               full_add_test=args.test_full)
 
 hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'n_epochs', #number of epochs
@@ -109,11 +116,16 @@ run_tag = '%s_lm=%s_da=%s_dk=%s_su=%s_size=%s_id=%d' % (task, hp.lm, hp.da,
         hp.dk, hp.summarize, str(hp.size), hp.run_id)
 run_tag = run_tag.replace('/', '_')
 
-config = {"task_type": "classification",
-  "vocab": ["0", "1"],
-  "trainset": trainset,
-  "validset":validset,
-  "testset": testsets[0]}   #idf only build from first testset, not the others.
+if args.input_train_full:
+    config = {"task_type": "classification",
+              "vocab": ["0", "1"],
+              "trainset": trainset}
+else:
+    config = {"task_type": "classification",
+      "vocab": ["0", "1"],
+      "trainset": trainset,
+      "validset":validset,
+      "testset": testsets[0]}  #idf only build from first testset, not the others.
 
 # summarize the sequences up to the max sequence length
 if hp.summarize:
@@ -147,7 +159,7 @@ for testset in testsets:
 
 # train and evaluate the model
 start_time = time.process_time()
-matcher, threshold, results_per_epoch = train(train_dataset,valid_dataset, test_datasets, run_tag, hp)
+matcher, threshold, results_per_epoch = train(train_dataset,valid_dataset, [test_datasets[0]], run_tag, hp)
 train_time = time.process_time() - start_time
 
 pairs = []
