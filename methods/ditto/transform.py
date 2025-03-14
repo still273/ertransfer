@@ -49,7 +49,8 @@ def transform_input(source_dir, add_test_data, output_dir, columns_to_join=None,
 
     if full_train_input:
         test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
-        train_df = pd.concat([train_df, valid_df, test_df], ignore_index=True)
+        train_df = pd.concat([train_df, valid_df], ignore_index=True) #test_df
+        valid_df = test_df
     print(train_df.shape)
     train, train_id = join_columns(train_df, columns_to_join, separator, prefixes)
     valid, valid_id = join_columns(valid_df, columns_to_join, separator, prefixes)
@@ -80,7 +81,7 @@ def transform_input(source_dir, add_test_data, output_dir, columns_to_join=None,
 
 
 
-def transform_output(scores, threshold, results_per_epoch, ids, labels, train_time, eval_time, test_input, dest_dir):
+def transform_output(scores, threshold, results_per_epoch, ids, labels,preprocess_time, train_time, eval_time, test_input, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
     metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
@@ -118,17 +119,20 @@ def transform_output(scores, threshold, results_per_epoch, ids, labels, train_ti
             'f1': [f1],
             'precision': [precision],
             'recall': [recall],
+            'preprocess_time': [preprocess_time[i]],
             'train_time': [train_time],
-            'eval_time': [eval_time],
+            'eval_time': [eval_time[i]],
         }).to_csv(os.path.join(dest_dir, f'metrics_{test_name}.csv'), index=False)
 
         epoch_res_cols += [f'f1_{test_name}', f'precision_{test_name}', f'recall_{test_name}']
-    if len(results_per_epoch[0]) < len(test_input)*3 + 4:
-        epoch_res_cols = epoch_res_cols[:4]
-    epoch_res_cols += ['train_time', 'valid_time', 'test_time']
-    pd.DataFrame(results_per_epoch,
-                 columns=epoch_res_cols
-                 ).to_csv(os.path.join(dest_dir, 'metrics_per_epoch.csv'), index=False)
+
+    if type(results_per_epoch) != type(None):
+        if len(results_per_epoch[0]) < len(test_input)*3 + 4:
+            epoch_res_cols = epoch_res_cols[:4]
+        epoch_res_cols += ['train_time', 'valid_time', 'test_time']
+        pd.DataFrame(results_per_epoch,
+                     columns=epoch_res_cols
+                     ).to_csv(os.path.join(dest_dir, 'metrics_per_epoch.csv'), index=False)
     return None
 
 
