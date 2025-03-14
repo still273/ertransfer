@@ -20,8 +20,8 @@ def plot_histogram(data, save_name):
     bins = np.arange(0, 1 + bin_width, bin_width)
 
     fig, ax = plt.subplots()
-    ax.hist(x0, bins=bins, label='0')
-    ax.hist(x1, bins=bins, label='1')
+    ax.hist(x0, bins=bins, label='0', alpha=0.5)
+    ax.hist(x1, bins=bins, label='1', alpha=0.5)
     ax.set_yscale('log')
     ax.legend()
     plt.show()
@@ -61,10 +61,13 @@ if __name__ == "__main__":
     data = pd.read_csv(args.input, encoding_errors='replace')
     data = data.astype(float)
     tune_sim_threshold(data, unique_mapping_clusters)
+    tune_sim_threshold(data, exact_clusters)
     #exact_clusters(data)
     #unique_mapping_clusters(data)
     #kmeans_probability(data, num_clusters=4)
     #kmeans_logits(data, num_clusters=2)
 
-    plot_logits(data, 'test_logits')
+
     plot_histogram(data, 'test_histogram')
+    if 'logit0' in data.columns:
+        plot_logits(data, 'test_logits')

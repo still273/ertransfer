@@ -1,7 +1,5 @@
 # Probability Clustering
 
-Splits the dataset into training, validation, and testing sets.
-Based on [KNN-Join](https://pyjedai.readthedocs.io/en/latest/tutorials/SimilarityJoins.html).
 
 ## Expected directory structure
 

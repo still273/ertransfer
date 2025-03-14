@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+from sklearn.model_selection import train_test_split
 
 def exact_clusters(data, limit=1, sim_threshold=0.7):
     top_matches_tableA = set([])
@@ -33,7 +34,7 @@ def exact_clusters(data, limit=1, sim_threshold=0.7):
     P = TP / num_candidates
     R = TP / GT
 
-    print(f'Cluster: F1 {F1}, P {P}, R {R}')
+    #print(f'Cluster: F1 {F1}, P {P}, R {R}')
     return F1, P, R
 
 def unique_mapping_clusters(data, sim_threshold=0.70):
@@ -59,14 +60,24 @@ def unique_mapping_clusters(data, sim_threshold=0.70):
     P = TP / num_candidates
     R = TP / GT
 
-    print(f'Cluster: F1 {F1}, P {P}, R {R}')
+    #print(f'Cluster: F1 {F1}, P {P}, R {R}')
     return F1, P, R
 
 
-def tune_sim_threshold(data, cluster_method, min_value=0, max_value=1, min_step=0.01):
+def tune_sim_threshold(data, cluster_method, min_value=0, max_value=1, min_step=0.01, split=True):
     x = np.arange(min_value, max_value, min_step)
-    y = [list(cluster_method(data, sim_threshold=sim)) for sim in x]
+    if split:
+        tune, data = train_test_split(data, train_size=0.2, stratify=data['label'])
+        y = [list(cluster_method(tune, sim_threshold=sim)) for sim in x]
+    else:
+        y = [list(cluster_method(data, sim_threshold=sim)) for sim in x]
     y = np.array(y)
+    best_f1_idx = np.argmax(y[:,0])
+    if split:
+        best_settings = list(cluster_method(data, sim_threshold=x[best_f1_idx]))
+    else:
+        best_settings = y[best_f1_idx]
+    print(best_settings, x[best_f1_idx])
     fig, ax = plt.subplots()
     ax.plot(x, y[:,0], '.', label='F1')
     ax.plot(x, y[:,1], '.', label='P')
@@ -75,5 +86,6 @@ def tune_sim_threshold(data, cluster_method, min_value=0, max_value=1, min_step=
     plt.show()
 
     plt.savefig('sim_threshold.png')
+    return best_settings, x[best_f1_idx]
 
 
