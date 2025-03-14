@@ -38,7 +38,7 @@ def predict(model, device, test_data_loader, include_token_type_ids=False):
     # remember, the logits are simply the output from the last layer, without applying an activation function (e.g. sigmoid).
     # for a simple classification this is also not necessary, we just take the index of the neuron with the maximal output.
     predicted_class = np.argmax(predictions, axis=1)
-
+    print(set(labels), set(predicted_class))
     simple_accuracy = (predicted_class == labels).mean()
     f1 = f1_score(y_true=labels, y_pred=predicted_class)
     scores = precision_recall_fscore_support(y_true=labels, y_pred=predicted_class)

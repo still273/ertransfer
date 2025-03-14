@@ -25,7 +25,8 @@ def train(device,
           save_model_after_epoch,
           experiment_name,
           output_dir,
-          model_type):
+          model_type,
+          tokenizer=None):
     logging.info("***** Run training *****")
     tb_writer = SummaryWriter(os.path.join(output_dir, experiment_name))
 
@@ -88,8 +89,8 @@ def train(device,
             best_epoch = curr_results
             best_f1 = f1
 
-        if save_model_after_epoch:
-            save_model(model, experiment_name, output_dir, epoch=epoch)
+            if save_model_after_epoch:
+                save_model(model, experiment_name, output_dir, epoch=None, tokenizer=tokenizer)
 
         if (t_test - t_start) + (t_test - t_epoch) > 8 * 60 * 60:  # if running the next epoch would lead to a total runtime
             # higher than 8 hours, break.
