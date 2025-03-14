@@ -173,7 +173,7 @@ else:
     f1s, ps, rs, score_dicts, time_m, res_per_epoch = train(train_iter, args.output, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs,
                                                             test_iter=test_iters, val_iter=val_iter,
           scheduler=scheduler, log_freq=log_freq, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'], save_name=model_name)
-    eval_time = time.process_time() - time_m
+    eval_time = [time.process_time() - time_m]
     train_time =  time_m - start_time
 
 transform_output(score_dicts, f1s, ps, rs, t_preprocess, train_time, eval_time, res_per_epoch, test_input, args.output)

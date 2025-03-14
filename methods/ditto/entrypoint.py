@@ -130,15 +130,15 @@ if args.prev_trained and os.path.exists(os.path.join(hp.logdir, hp.lm)):
                   "testset": testset}
         if hp.summarize:
             summarizer = Summarizer(config, lm=hp.lm)
-            testsets[i] = summarizer.transform_file(testset, max_len=hp.max_len)
+            testsets[i] = summarizer.transform_file(testset, max_len=hp.max_len, overwrite=True)
 
         if hp.dk is not None:
             if hp.dk == 'product':
                 injector = ProductDKInjector(config, hp.dk)
             else:
                 injector = GeneralDKInjector(config, hp.dk)
-            testsets[i] = injector.transform_file(testset)
-        test_datasets += DittoDataset(testset, lm=hp.lm)
+            testsets[i] = injector.transform_file(testset, overwrite=True)
+        test_datasets += [DittoDataset(testset, lm=hp.lm)]
         t_preprocess += [time.process_time() - t_pstart]
     #test_datasets = [DittoDataset(testset, lm=hp.lm) for testset in testsets]
 

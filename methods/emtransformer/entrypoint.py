@@ -8,7 +8,6 @@ import time
 from config import Config
 from data_loader import load_data, DataType
 from data_representation import InputExample
-from methods.ditto.entrypoint import t_preprocess
 from optimizer import build_optimizer
 from prediction import predict
 from torch_initializer import initialize_gpu_seed
@@ -177,12 +176,12 @@ else:
         t_pstart = time.process_time()
         test_example = [InputExample(i, row[prefix_1 + 'AgValue'], row[prefix_2 + 'AgValue'], row['label']) for i, row
                       in test_df.iterrows()]
-        test_data_loaders += load_data(test_example,
+        test_data_loaders += [load_data(test_example,
                                    label_list,
                                    tokenizer,
                                    max_seq_length,
                                    train_batch_size,
-                                   DataType.TEST, model_name)
+                                   DataType.TEST, model_name)]
         t_preprocess += [time.process_time() - t_pstart]
     # test_examples = [[InputExample(i, row[prefix_1 + 'AgValue'], row[prefix_2 + 'AgValue'], row['label']) for i, row
     #                   in test_df.iterrows()] for test_df in test_dfs]
