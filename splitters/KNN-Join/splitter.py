@@ -1,4 +1,5 @@
 import argparse
+import time
 from os import path
 import os
 import random
@@ -92,18 +93,34 @@ def generate_candidates(tableA_df, tableB_df, matches_df, settings):
         pairs_df['label'].reset_index(drop=True)
     ], axis=1)
 
+def get_stats(data, num_matches_total, name):
+    num = data.shape[0]
+    num_m = data['label'].sum()
+    r = data['label'].sum() / num_matches_total
+    p = data['label'].sum() / data.shape[0]
+    return [[name, num, num_m, p, r]]
 
 def split_input(tableA_df, tableB_df, matches_df, settings, seed = 1, valid=True):
+    t_start = time.process_time()
     candidates = generate_candidates(tableA_df, tableB_df, matches_df, settings)
+    t_stop = time.process_time()
+    stats = get_stats(candidates, matches_df.shape[0], 'candidates')
     print("Candidates generated: ", candidates.shape[0])
     if valid:
         train, test_valid = train_test_split(candidates, train_size=0.6, random_state=seed, shuffle=True,
                                              stratify=candidates['label'])
         valid, test = train_test_split(test_valid, train_size=0.5, random_state=seed, shuffle=True,
                                        stratify=test_valid['label'])
-        return (train, valid, test)
+        stats += get_stats(train, matches_df.shape[0], 'train')
+        stats += get_stats(valid, matches_df.shape[0], 'valid')
+        stats += get_stats(test, matches_df.shape[0], 'test')
+        return train, valid, test, stats, t_stop-t_start
 
-    return train_test_split(candidates, train_size=0.75, random_state=seed, shuffle=True, stratify=candidates['label'])
+    train, test = train_test_split(candidates, train_size=0.75,
+                                   random_state=seed, shuffle=True, stratify=candidates['label'])
+    stats += get_stats(train, matches_df.shape[0], 'train')
+    stats += get_stats(test, matches_df.shape[0], 'test')
+    return train, test, stats, t_stop-t_start
 
 
 if __name__ == "__main__":
@@ -147,9 +164,11 @@ if __name__ == "__main__":
     folders =[entry for entry in str(args.input).split('/') if entry != '']
     dataset_folder = folders[-1]
     dataset = dataset_folder.split('_')[0]
+    print(dataset)
     settings = dataset_settings[args.recall][dataset]
+    print(settings)
 
-    train, valid, test = split_input(tableA_df, tableB_df, matches_df,
+    train, valid, test, stats, runtime = split_input(tableA_df, tableB_df, matches_df,
                                      seed=random.randint(0, 4294967295), settings=settings, valid=True)
     print("Done! Train size: {}, test size: {}.".format(train.shape[0], test.shape[0]))
 
@@ -160,3 +179,14 @@ if __name__ == "__main__":
     tableA_df.to_csv(os.path.join(output_folder, "tableA.csv"), index=False)
     tableB_df.to_csv(os.path.join(output_folder, "tableB.csv"), index=False)
     matches_df.to_csv(os.path.join(output_folder, "matches.csv"), index=False)
+
+    f = open(os.path.join(output_folder, 'split_statistics.txt'), 'w')
+    print('Dataset statistics:', file=f)
+    print(f'Entries Table A: {tableA_df.shape[0]}; Entries Table B: {tableB_df.shape[0]}', file=f)
+    print(f'Num Matches: {matches_df.shape[0]}', file=f)
+    print(f'Blocking time: {runtime}', file=f)
+    print('Split Statistics:', file=f)
+    print(*['', 'Num Entries', 'Num Matches', 'Precision', 'Recall'], file=f, sep='\t')
+    for line in stats:
+        print(*line, file=f, sep='\t')
+    f.close()
