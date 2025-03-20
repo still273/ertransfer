@@ -42,14 +42,23 @@ def generate_candidates(tableA_df, tableB_df, matches_df, settings):
         block_A[ac_tableA] = block_A[ac_tableA].map(lambda x: clean_entry(x, snowball_stemmer, stop_words))
         block_B[ac_tableB] = block_B[ac_tableB].map(lambda x: clean_entry(x, snowball_stemmer, stop_words))
 
+    block_A['agValue'] = block_A[ac_tableA].aggregate(' '.join, axis=1)
+    block_A['agValue'] = block_A['agValue'].str.replace('nan', '')
+    print(block_A['agValue'])
+    block_A.drop(ac_tableA, axis=1, inplace=True)
+    block_B['agValue'] = block_B[ac_tableB].aggregate(' '.join, axis=1)
+    block_B['agValue'] = block_B['agValue'].str.replace('nan','')
+    print(block_B['agValue'].iloc[0])
+    block_B.drop(ac_tableB, axis=1, inplace=True)
+
     if settings['reverse']:
         data = Data(
             dataset_1=block_B,
             dataset_2=block_A,
             id_column_name_1 = 'id',
             id_column_name_2 = 'id',
-            attributes_1 = ac_tableB,
-            attributes_2 = ac_tableA,
+            attributes_1 = ['agValue'],
+            attributes_2 = ['agValue'],
         )
     else:
         data = Data(
@@ -57,8 +66,8 @@ def generate_candidates(tableA_df, tableB_df, matches_df, settings):
             dataset_2=block_B,
             id_column_name_1='id',
             id_column_name_2='id',
-            attributes_1=ac_tableA,
-            attributes_2=ac_tableB,
+            attributes_1=['agValue'],
+            attributes_2=['agValue'],
         )
     if settings['QGram'] == 0:
         tokenization = 'standard'
@@ -131,6 +140,8 @@ if __name__ == "__main__":
                         help='Output directory to store the output. If not provided, the input directory will be used')
     parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.9,
                         help='The recall value for the train set')
+    parser.add_argument('-d', '--default', action='store_true',
+                        help='if set the default configuration is used')
     args = parser.parse_args()
 
     if args.output is None:
@@ -164,9 +175,13 @@ if __name__ == "__main__":
     folders =[entry for entry in str(args.input).split('/') if entry != '']
     dataset_folder = folders[-1]
     dataset = dataset_folder.split('_')[0]
-    print(dataset)
-    settings = dataset_settings[args.recall][dataset]
-    print(settings)
+    if args.default:
+        settings = {'clean':True, 'reverse':False, 'QGram': 5, 'multiset': True, 'similarity':'cosine', 'K':5}
+        if tableA_df.shape[0]<tableB_df.shape[0]:
+            settings['reverse'] = True
+    else:
+        settings = dataset_settings[args.recall][dataset]
+
 
     train, valid, test, stats, runtime = split_input(tableA_df, tableB_df, matches_df,
                                      seed=random.randint(0, 4294967295), settings=settings, valid=True)
