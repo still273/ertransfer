@@ -1,0 +1,24 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
+
+%labels
+    Author Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to calculate embeddings of attributes.
+    It requires 2 arguments: path to the input directory, path to the output directory.
+
+%files
+    requirements.txt /srv
+    entrypoint.py /srv
+    get_features.py /srv
+    transform.py /srv
+    data.py /srv
+
+%post
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+
+%runscript
+    exec python -u /srv/entrypoint.py  "$@"
