@@ -35,12 +35,14 @@ parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(
                     help='The random state used to initialize the algorithms and split dataset')
 parser.add_argument('-e', '--epochs', type=int, nargs='?', default=2,
                     help='Number of epochs to train the model')
-parser.add_argument('-if', '--input_train_full', action='store_true',
-                    help='Use also the test data of the input for training')
+parser.add_argument('-if', '--input_train_full', type=str, default=None, nargs='?',
+                    choices=['v', 'vt'], help='v: use also valid data for training, validate on test data, vt: use valid and test data for training')
 parser.add_argument('-tf', '--test_full', action='store_true',
                     help='Evaluate the full candidates of the additional test data')
 parser.add_argument('-pt', '--prev_trained', action='store_true',
                     help='use stored model if available')
+parser.add_argument('-le','--last_epoch', action='store_true',
+                    help='store model at last epoch')
 
 args = parser.parse_args()
 
@@ -73,6 +75,7 @@ hyperparameters = namedtuple('hyperparameters', ['lm', #language Model
                                                  'max_len', #max number of tokens as input for language model
                                                  'lr', #learning rate
                                                  'save_model',
+                                                 'last_epoch',
                                                  'logdir',
                                                  'fp16', #train with half precision
                                                  'da', #data augmentation
@@ -88,6 +91,7 @@ hp = hyperparameters(lm = 'roberta',
                      max_len = 256,
                      lr = 3e-5,
                      save_model = args.prev_trained,
+                     last_epoch = args.last_epoch,
                      logdir = temp_output,
                      fp16 = True,
                      da = 'all',
@@ -146,7 +150,7 @@ if args.prev_trained and os.path.exists(os.path.join(hp.logdir, hp.lm)):
     threshold = 0.5
     results_per_epoch = None
     train_time = 0
-
+    train_size = 0
 else:
     if args.input_train_full:
         config = {"task_type": "classification",
@@ -185,6 +189,7 @@ else:
                                    max_len=hp.max_len,
                                    size=hp.size,
                                    da=hp.da)
+    train_size = len(train_dataset)
     valid_dataset = DittoDataset(validset, lm=hp.lm)
     test_datasets = []
     for testset in testsets:
@@ -219,7 +224,7 @@ for i, testset in enumerate(testsets):
 
 
 
-transform_output(scores, threshold, results_per_epoch, test_ids, labels, t_preprocess, train_time, eval_time, test_input, args.output)
+transform_output(scores, threshold, results_per_epoch, test_ids, labels, t_preprocess, train_time, eval_time, test_input, train_size, args.output)
 
 # Step 4. Delete temporary files
 for file in os.listdir(temp_output):

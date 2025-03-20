@@ -32,7 +32,10 @@ def transform_input(source_dir, add_test_data, columns_to_join=None, separator='
     train_df = pd.read_csv(os.path.join(source_dir, 'train.csv'), encoding_errors='replace')
     valid_df = pd.read_csv(os.path.join(source_dir, 'valid.csv'), encoding_errors='replace')
 
-    if full_train_input:
+    if full_train_input == 'vt':
+        test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
+        train_df = pd.concat([train_df, valid_df, test_df], ignore_index=True)  # test_df
+    elif full_train_input == 'v' :
         test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
         train_df = pd.concat([train_df, valid_df], ignore_index=True)
         valid_df = test_df
@@ -56,7 +59,7 @@ def transform_input(source_dir, add_test_data, columns_to_join=None, separator='
     return train, valid, test_files
 
 
-def transform_output(predictions, logits, test_table, results_per_epoch,preprocess_time, train_time, eval_time, test_input, dest_dir):
+def transform_output(predictions, logits, test_table, results_per_epoch,preprocess_time, train_time, eval_time, test_input, train_size, dest_dir):
     """
     Transform the output of the method into two common format files, which are stored in the destination directory.
     metrics.csv: f1, precision, recall, train_time, eval_time (1 row, 5 columns, with header)
@@ -95,6 +98,7 @@ def transform_output(predictions, logits, test_table, results_per_epoch,preproce
             'preprocess_time': [preprocess_time[i]],
             'train_time': [train_time],
             'eval_time': [eval_time[i]],
+            'train_size': [train_size],
         }).to_csv(os.path.join(dest_dir, f'metrics_{test_name}.csv'), index=False)
         epoch_res_cols += [f'f1_{test_name}', f'precision_{test_name}', f'recall_{test_name}']
     if type(results_per_epoch) != type(None):

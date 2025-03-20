@@ -5,7 +5,10 @@ def transform_input(source_dir, add_test_data, output_dir, prefixes=['tableA_', 
                     full_train_input=False, full_add_test=False):
     train_df = pd.read_csv(os.path.join(source_dir, 'train.csv'), encoding_errors='replace')
     valid_df = pd.read_csv(os.path.join(source_dir, 'valid.csv'), encoding_errors='replace')
-    if full_train_input:
+    if full_train_input == 'vt':
+        test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
+        train_df = pd.concat([train_df, valid_df, test_df], ignore_index=True)
+    elif full_train_input =='v':
         test_df = pd.read_csv(os.path.join(source_dir, 'test.csv'), encoding_errors='replace')
         train_df = pd.concat([train_df, valid_df], ignore_index=True)
         valid_df = test_df
@@ -43,7 +46,7 @@ def transform_input(source_dir, add_test_data, output_dir, prefixes=['tableA_', 
     return tableAs, tableBs, test_files
 
 
-def transform_output(score_dicts, f1s, ps, rs, preprocess_time,train_time, eval_time, results_per_epoch, test_input, dest_dir):
+def transform_output(score_dicts, f1s, ps, rs, preprocess_time,train_time, eval_time, results_per_epoch, test_input, train_size, dest_dir):
     epoch_res_cols = ['epoch']
     for i, test_folder in enumerate(test_input):
         test_name = str(test_folder).split('/')[-2]
@@ -71,6 +74,7 @@ def transform_output(score_dicts, f1s, ps, rs, preprocess_time,train_time, eval_
             'preprocess_time':[preprocess_time[i]]* len(f1s[i]),
             'train_time': [train_time] * len(f1s[i]),
             'eval_time': [eval_time[i]] * len(f1s[i]),
+            'train_size': [train_size] * len(f1s[i]),
         }).to_csv(os.path.join(dest_dir, f'metrics_{test_name}.csv'), index=False)
         epoch_res_cols += [f'f1_{test_name}', f'precision_{test_name}', f'recall_{test_name}']
     if type(results_per_epoch) != type(None):

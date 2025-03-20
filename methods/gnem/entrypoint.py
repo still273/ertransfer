@@ -33,14 +33,16 @@ parser.add_argument('-e', '--epochs', type=int, nargs='?', default=1,
                     help='Number of epochs to train the model')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
-parser.add_argument('-if', '--input_train_full', action='store_true',
-                    help='Use also the test data of the input for training')
+parser.add_argument('-if', '--input_train_full', type=str, default=None, nargs='?',
+                    choices=['v', 'vt'], help='v: use also valid data for training, validate on test data, vt: use valid and test data for training')
 parser.add_argument('-tf', '--test_full', action='store_true',
                     help='Evaluate the full candidates of the additional test data')
 parser.add_argument('-pt', '--prev_trained', action='store_true',
                     help='use stored model if available')
 parser.add_argument('-lm', '--languagemodel', type=str, nargs='?', default='BERT',
                     help='The language model to use', choices=['BERT', 'RoBERTa', 'DistilBERT', 'XLNet', 'XLM', 'ALBERT'])
+parser.add_argument('-le','--last_epoch', action='store_true',
+                    help='store model at last epoch')
 
 args = parser.parse_args()
 os.makedirs(args.output, exist_ok=True)
@@ -118,6 +120,7 @@ if args.prev_trained and os.path.exists(os.path.join(args.output, model_name)):
         score_dicts += [scores]
         eval_time += [time.process_time() - t_start]
     train_time = 0
+    train_size = 0
     res_per_epoch = None
 else:
 
@@ -149,7 +152,7 @@ else:
     val_iter = DataLoader(val_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=False)
     test_iters = [DataLoader(test_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=False)
                   for test_dataset in test_datasets]
-
+    train_size = len(train_dataset)
     t_preprocess += [time.process_time() - t_pstart]
 
     num_train_steps = len(train_iter) * args.epochs
@@ -172,9 +175,9 @@ else:
     start_time = time.process_time()
     f1s, ps, rs, score_dicts, time_m, res_per_epoch = train(train_iter, args.output, logger, tf_logger, model, embedmodel, opt, criterion, args.epochs,
                                                             test_iter=test_iters, val_iter=val_iter,
-          scheduler=scheduler, log_freq=log_freq, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'], save_name=model_name)
+          scheduler=scheduler, log_freq=log_freq, start_epoch=start_epoch, start_f1=start_f1, score_type=['mean'], save_name=model_name, save_last_epoch=args.last_epoch)
     eval_time = [time.process_time() - time_m]
     train_time =  time_m - start_time
 
-transform_output(score_dicts, f1s, ps, rs, t_preprocess, train_time, eval_time, res_per_epoch, test_input, args.output)
+transform_output(score_dicts, f1s, ps, rs, t_preprocess, train_time, eval_time, res_per_epoch, test_input, train_size, args.output)
 print("Final output: ", os.listdir(args.output))

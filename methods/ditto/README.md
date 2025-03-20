@@ -29,7 +29,7 @@ apptainer build ../../apptainer/ditto.sif container.def
 srun -p ampere --gpus=1 apptainer run ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/ ../../output/ditto/
 
 # dev mode with bind
-srun -p ampere --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/ ../../output/ditto/
+srun -p ampere --gpus=1 apptainer run --bind ./:/srv ../../apptainer/ditto.sif ../../datasets/d2_abt_buy/kj_split ../../output/ditto/ -if vt -pt -le
 ```
 
 ## Last error

@@ -27,8 +27,8 @@ parser.add_argument('-r', '--recall', type=float, nargs='?', default=0.8,
                     help='Recall value used to select ground truth pairs')
 parser.add_argument('-s', '--seed', type=int, nargs='?', default=random.randint(0, 4294967295),
                     help='The random state used to initialize the algorithms and split dataset')
-parser.add_argument('-if', '--input_train_full', action='store_true',
-                    help='Use also the test data of the input for training')
+parser.add_argument('-if', '--input_train_full', type=str, default=None, nargs='?',
+                    choices=['v', 'vt'], help='v: use also valid data for training, validate on test data, vt: use valid and test data for training')
 parser.add_argument('-tf', '--test_full', action='store_true',
                     help='Evaluate the full candidates of the additional test data')
 
@@ -38,6 +38,8 @@ parser.add_argument('-e', '--epochs', type=int, nargs='?', default=5,  # 15.0
                     help='Number of epochs to train the model')
 parser.add_argument('-pt', '--prev_trained', action='store_true',
                     help='use stored model if available')
+parser.add_argument('-le','--last_epoch', action='store_true',
+                    help='store model at last epoch')
 
 args = parser.parse_args()
 os.makedirs(args.output, exist_ok=True)
@@ -75,7 +77,7 @@ model_name = args.languagemodel.lower()
 max_seq_length = 128
 train_batch_size = 16
 
-
+train_size = train_df.shape[0]
 config_class, model_class, tokenizer_class = Config.MODEL_CLASSES[model_name]
 loaded_model=False
 if args.prev_trained == True and os.path.exists(os.path.join(args.output, model_name)):
@@ -164,7 +166,8 @@ if not loaded_model:
                               experiment_name=model_name,
                               output_dir=args.output,
                               model_type=model_name,
-                              tokenizer=tokenizer)
+                              tokenizer=tokenizer,
+                              save_last_epoch=args.last_epoch)
     train_time = time.process_time() - start_time
 
     # if args.prev_trained:
@@ -212,5 +215,5 @@ for test_data_loader in test_data_loaders:
 
 
 # Step 3. Convert the output into a common format
-transform_output(preds, logs, test_dfs, results_per_epoch,t_preprocess, train_time, eval_time, test_input,args.output)
+transform_output(preds, logs, test_dfs, results_per_epoch,t_preprocess, train_time, eval_time, test_input,train_size,args.output)
 print("Final output: ", os.listdir(args.output))
