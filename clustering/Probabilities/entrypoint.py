@@ -1,5 +1,6 @@
 import argparse
 import pathtype
+import os
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
@@ -53,21 +54,45 @@ if __name__ == "__main__":
                         help='Input File containing the dataset')
     parser.add_argument('output', type=str, nargs='?',
                         help='Output directory to store the output. If not provided, the input directory will be used')
+    parser.add_argument('-d', '--default', action='store_true')
     args = parser.parse_args()
 
+    input_file = args.input.stem
+    input_folder = args.input.parent
     if args.output is None:
-        args.output = args.input
+        output_folder = input_folder
+    else:
+        output_folder = args.output
+    input_data = input_file[len('predictions_'):]
+    output_file = os.path.join(output_folder, f"{input_data}_clustering.txt")
 
     data = pd.read_csv(args.input, encoding_errors='replace')
     data = data.astype(float)
-    tune_sim_threshold(data, unique_mapping_clusters)
-    tune_sim_threshold(data, exact_clusters)
-    #exact_clusters(data)
-    #unique_mapping_clusters(data)
-    #kmeans_probability(data, num_clusters=4)
-    #kmeans_logits(data, num_clusters=2)
+    if args.default:
+        threshold = 0.5
+        tune_time = 0
+        best_settings = unique_mapping_clusters(data, sim_threshold=threshold)
+    else:
+        best_settings, threshold, tune_time = tune_sim_threshold(data, unique_mapping_clusters, split=True,
+                                                             plot_name = os.path.join(output_folder, f"{input_data}_UMC.png"))
+    f = open(output_file, 'w')
+    print('Unique Mapping Clustering', file=f)
+    print(*['F1', 'P', 'R', 'Cluster Time', 'Tune Time', 'Threshold'], file=f, sep='\t')
+    print(*(list(best_settings) + [tune_time, threshold]), file=f, sep='\t' )
+    f.close()
+    if args.default:
+        threshold = 0.5
+        tune_time = 0
+        best_settings = exact_clusters(data, sim_threshold=threshold)
+    else:
+        best_settings, threshold, tune_time = tune_sim_threshold(data, exact_clusters, split=True,
+                                                             plot_name = os.path.join(output_folder, f"{input_data}_EC.png"))
 
+    f = open(output_file, 'a')
+    print('Exact Clustering', file=f)
+    print(*['F1', 'P', 'R', 'Cluster Time', 'Tune Time', 'Threshold'], file=f, sep='\t')
+    print(*(list(best_settings) + [tune_time, threshold]), file=f, sep='\t')
+    f.close()
 
-    plot_histogram(data, 'test_histogram')
-    if 'logit0' in data.columns:
-        plot_logits(data, 'test_logits')
+    plot_histogram(data, os.path.join(output_folder, f"{input_data}_histogram.png"))
+
