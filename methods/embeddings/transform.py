@@ -19,7 +19,6 @@ def join_columns(table, columns_to_join=None, separator=' '):
     # part_table = part_table.map(lambda x: x.replace('nan', ''))
     join_table.rename('AgValue', inplace=True)
     join_table = pd.DataFrame(join_table)
-    print(join_table)
 
     join_table['id'] = table['id']
 
