@@ -45,7 +45,7 @@ def add_catalog_information(df, tableA, tableB):
 read_prefixes = ['tableA_', 'tableB_']
 
 dataset, tableA, tableB, GT = transform_input(args.input, read_prefixes, args.full)
-
+t_start = time.perf_counter()
 em.set_key(tableA, 'id')
 em.set_key(tableB, 'id')
 add_catalog_information(dataset, tableA, tableB)
@@ -60,7 +60,7 @@ id_dfs = (id_df, None, None)
 true_labels = cand_features.gold.values
 if np.sum(true_labels)==0:
     true_labels = None
-
+t_preprocess = time.perf_counter() - t_start
 start_time = time.process_time()
 y_pred, results_per_iteration = utils.run_zeroer(sim_features, sim_features_lr,id_dfs,
                     true_labels , LR_dup_free= True, LR_identical=False, run_trans=True)
@@ -69,4 +69,4 @@ eval_time = time.process_time() - start_time
 pred_df = cand_features.copy()
 pred_df['pred'] = y_pred
 
-transform_output(pred_df, results_per_iteration, 0, eval_time, args.output)
+transform_output(pred_df, results_per_iteration, 0, eval_time, t_preprocess, args.output)
