@@ -11,7 +11,9 @@ test
 embedding
 db_split
 kj_split
+dkj_split
 slurm*.out
+*.sh
 
 /apptainer
 /input

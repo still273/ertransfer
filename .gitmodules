@@ -16,3 +16,15 @@
 [submodule "ertransfer_gnem"]
 	path = methods/gnem/fork-gnem
 	url = git@github.com:still273/fork-gnem.git
+[submodule "methods/dader/fork-dader"]
+	path = methods/dader/fork-dader
+	url = git@github.com:still273/fork-DADER.git
+[submodule "methods/emtransformer/fork-emtransformer"]
+	path = methods/emtransformer/fork-emtransformer
+	url = git@github.com:still273/fork-EMTransformer.git
+[submodule "methods/unicorn/fork-unicorn"]
+	path = methods/unicorn/fork-unicorn
+	url = git@github.com:still273/fork-Unicorn.git
+[submodule "methods/sudowoodo/fork-sudowoodo"]
+	path = methods/sudowoodo/fork-sudowoodo
+	url = git@github.com:still273/fork-sudowoodo.git
