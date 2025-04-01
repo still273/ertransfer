@@ -1,0 +1,27 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.7.1-cuda11.0-cudnn8-runtime
+
+%labels
+    Franziska Neuhof
+    Version v0.0.1
+
+%help
+    A container to run DADER for entity matching.
+    It requires 2 arguments: path to the input directory, path to the output directory.
+
+%files
+    requirements.txt /srv
+    fork-dader /srv
+    entrypoint.py /srv
+    transform.py /srv
+
+%post
+    apt-get update --allow-insecure-repositories && \
+        apt-get install -y build-essential && \
+        rm -rf /var/lib/apt/lists/*
+
+    cd /srv
+    pip install --no-cache-dir -r requirements.txt
+
+%runscript
+    exec python -u /srv/entrypoint.py  "$@"
