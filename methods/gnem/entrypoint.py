@@ -155,6 +155,10 @@ else:
     train_size = len(train_dataset)
     t_preprocess += [time.process_time() - t_pstart]
 
+    f = open(os.path.join(args.output, 'prep_time.txt'), 'w')
+    print(f'Prep time: {t_preprocess}', file=f)
+    f.close()
+
     num_train_steps = len(train_iter) * args.epochs
     opt = AdamW(optimizer_grouped_parameters, eps=1e-8)
     scheduler = get_linear_schedule_with_warmup(opt, num_warmup_steps=0, num_training_steps=num_train_steps)

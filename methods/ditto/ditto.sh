@@ -6,6 +6,7 @@
 #SBATCH --gpus=1                    # Number of GPUs to request
 #SBATCH --mem=32G                   # Amount of RAM memory requested
 #SBATCH -p ampere
+#SBATCH --nodelist=gpunode02,gpunode03,gpunode04,gpunode06
 ##SBATCH --qos=standby
 
 apptainer run --bind ./:/srv ../../apptainer/ditto.sif "$@"

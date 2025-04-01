@@ -47,7 +47,7 @@ parser.add_argument('-le','--last_epoch', action='store_true',
 args = parser.parse_args()
 
 os.makedirs(args.output, exist_ok=True)
-temp_output = os.path.join(args.output, 'temp')
+temp_output = os.path.join(args.output, 'temp_2')
 os.makedirs(temp_output, exist_ok=True)
 
 print("Hi, I'm DITTO entrypoint!")
@@ -195,6 +195,9 @@ else:
     for testset in testsets:
         test_datasets.append(DittoDataset(testset, lm=hp.lm))
     t_preprocess += [time.process_time() - t_pstart]
+    f = open(os.path.join(args.output, 'prep_time.txt'), 'w')
+    print(f'Prep time: {t_preprocess}', file=f)
+    f.close()
     # train and evaluate the model
     start_time = time.process_time()
     matcher, threshold, results_per_epoch = train(train_dataset,valid_dataset, [test_datasets[0]], run_tag, hp)

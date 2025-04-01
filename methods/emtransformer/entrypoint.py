@@ -143,6 +143,9 @@ if not loaded_model:
                                  train_batch_size,
                                  DataType.TEST, model_name) for test_example in test_examples]
     t_preprocess += [time.process_time() - t_pstart]
+    f = open(os.path.join(args.output, 'prep_time.txt'), 'w')
+    print(f'Prep time: {t_preprocess}', file=f)
+    f.close()
     num_train_steps = len(training_data_loader) * args.epochs
 
     optimizer, scheduler = build_optimizer(model,
