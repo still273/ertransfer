@@ -72,26 +72,37 @@ if __name__ == "__main__":
         threshold = 0.5
         tune_time = 0
         best_settings = unique_mapping_clusters(data, sim_threshold=threshold)
+        mean = [best_settings[0], tune_time, best_settings[3]]
+        std = [0,0,0]
     else:
-        best_settings, threshold, tune_time = tune_sim_threshold(data, unique_mapping_clusters, split=True,
-                                                             plot_name = os.path.join(output_folder, f"{input_data}_UMC.png"))
+        best_settings, threshold, tune_time, mean, std = tune_sim_threshold(data, unique_mapping_clusters, split=True,
+                                                          plot_name = os.path.join(output_folder, f"{input_data}_UMC.png"))
+    print(mean, std)
     f = open(output_file, 'w')
     print('Unique Mapping Clustering', file=f)
     print(*['F1', 'P', 'R', 'Cluster Time', 'Tune Time', 'Threshold'], file=f, sep='\t')
     print(*(list(best_settings) + [tune_time, threshold]), file=f, sep='\t' )
+    print(f"Average F1 +- STD: {mean[0]}\t{std[0]}", file=f)
+    print(f"Average Tune Time +- STD: {mean[1]}\t{std[1]}", file=f)
+    print(f"Average Cluster Time +- STD: {mean[2]}\t{std[2]}", file=f)
     f.close()
     if args.default:
         threshold = 0.5
         tune_time = 0
         best_settings = exact_clusters(data, sim_threshold=threshold)
+        mean = [best_settings[0], tune_time, best_settings[3]]
+        std = [0, 0, 0]
     else:
-        best_settings, threshold, tune_time = tune_sim_threshold(data, exact_clusters, split=True,
+        best_settings, threshold, tune_time, mean, std = tune_sim_threshold(data, exact_clusters, split=True,
                                                              plot_name = os.path.join(output_folder, f"{input_data}_EC.png"))
 
     f = open(output_file, 'a')
     print('Exact Clustering', file=f)
     print(*['F1', 'P', 'R', 'Cluster Time', 'Tune Time', 'Threshold'], file=f, sep='\t')
     print(*(list(best_settings) + [tune_time, threshold]), file=f, sep='\t')
+    print(f"Average F1 +- STD: {mean[0]}\t{std[0]}", file=f)
+    print(f"Average Tune Time +- STD: {mean[1]}\t{std[1]}", file=f)
+    print(f"Average Cluster Time +- STD: {mean[2]}\t{std[2]}", file=f)
     f.close()
 
     plot_histogram(data, os.path.join(output_folder, f"{input_data}_histogram.png"))

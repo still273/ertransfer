@@ -67,19 +67,28 @@ def unique_mapping_clusters(data, sim_threshold=0.70):
     return F1, P, R, cluster_time
 
 
-def tune_sim_threshold(data, cluster_method, min_value=0, max_value=1, min_step=0.01, split=True, plot_name=None):
+def tune_sim_threshold(data, cluster_method, min_value=0, max_value=1, min_step=0.01, split=True, plot_name=None, num_runs=10):
     x = np.arange(min_value, max_value, min_step)
-    if split:
-        tune, data = train_test_split(data, train_size=0.2, stratify=data['label'])
-        y = [list(cluster_method(tune, sim_threshold=sim)) for sim in x]
-    else:
-        y = [list(cluster_method(data, sim_threshold=sim)) for sim in x]
-    y = np.array(y)
-    best_f1_idx = np.argmax(y[:,0])
-    if split:
-        best_settings = list(cluster_method(data, sim_threshold=x[best_f1_idx]))
-    else:
-        best_settings = y[best_f1_idx]
+    collected_results = []
+    full_data = data.copy()
+    for run_id in range(num_runs):
+        data = full_data
+        if split:
+            tune, data = train_test_split(data, train_size=0.2, stratify=data['label'])
+            y = [list(cluster_method(tune, sim_threshold=sim)) for sim in x]
+        else:
+            y = [list(cluster_method(data, sim_threshold=sim)) for sim in x]
+        y = np.array(y)
+        best_f1_idx = np.argmax(y[:,0])
+        if split:
+            best_settings = list(cluster_method(data, sim_threshold=x[best_f1_idx]))
+        else:
+            best_settings = y[best_f1_idx]
+        collected_results += [[best_settings[0], y[:,3].sum(), best_settings[3]]]
+    collected_results = np.array(collected_results)
+    print(collected_results)
+    mean = np.mean(collected_results, keepdims=True, axis=0)
+    std = np.std(collected_results,axis=0, ddof=1, mean=mean)
     print(best_settings, x[best_f1_idx])
     if type(plot_name) != type(None):
         fig, ax = plt.subplots()
@@ -90,6 +99,6 @@ def tune_sim_threshold(data, cluster_method, min_value=0, max_value=1, min_step=
         plt.show()
 
         plt.savefig(plot_name)
-    return best_settings, x[best_f1_idx], y[:,3].sum()
+    return best_settings, x[best_f1_idx], y[:,3].sum(), mean.flatten(), std
 
 
